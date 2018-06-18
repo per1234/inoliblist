@@ -1,0 +1,67 @@
+{
+  "libraries": [
+    {
+      "name": "Esplora",
+      "version": "1.0.0",
+      "author": "Arduino",
+      "maintainer": "Arduino info@arduino.cc",
+      "sentence": "Grants easy access to the various sensors and actuators of the Esplora. For Arduino Esplora only.",
+      "paragraph": "The sensors available on the board are:2-Axis analog joystick with center push-button,4 push-buttons,microphone, light sensor, temperature sensor, 3-axis accelerometer, 2 TinkerKit input connectors./brThe actuators available on the board are: bright RGB LED, piezo buzzer, 2 TinkerKit output connectors.",
+      "website": "http://arduino.cc/en/Reference/EsploraLibrary",
+      "category": "Device Control",
+      "architectures": [
+        "avr"
+      ],
+      "types": [
+        "Arduino"
+      ],
+      "repository": "https://github.com/arduino-libraries/Esplora.git",
+      "url": "http://downloads.arduino.cc/libraries/github.com/arduino-libraries/Esplora-1.0.0.zip",
+      "archiveFileName": "Esplora-1.0.0.zip",
+      "size": 19695,
+      "checksum": "SHA-256:25a0d6a3fcafc0e09cc8a24dcf3620e4a6530cff04094424b6827acf572f0b87"
+    },
+    {
+      "name": "Esplora",
+      "version": "1.0.1",
+      "author": "Arduino",
+      "maintainer": "Arduino info@arduino.cc",
+      "sentence": "Grants easy access to the various sensors and actuators of the Esplora. For Arduino Esplora only.",
+      "paragraph": "The sensors available on the board are:2-Axis analog joystick with center push-button,4 push-buttons,microphone, light sensor, temperature sensor, 3-axis accelerometer, 2 TinkerKit input connectors./brThe actuators available on the board are: bright RGB LED, piezo buzzer, 2 TinkerKit output connectors.",
+      "website": "http://arduino.cc/en/Reference/EsploraLibrary",
+      "category": "Device Control",
+      "architectures": [
+        "avr"
+      ],
+      "types": [
+        "Arduino"
+      ],
+      "repository": "https://github.com/arduino-libraries/Esplora.git",
+      "url": "http://downloads.arduino.cc/libraries/github.com/arduino-libraries/Esplora-1.0.1.zip",
+      "archiveFileName": "Esplora-1.0.1.zip",
+      "size": 19695,
+      "checksum": "SHA-256:a496ac27dc793078f0c5c18df0a3cb84e7867c1939a914dbb9654b1189fce4af"
+    },
+    {
+      "name": "Audio",
+      "version": "1.0.0",
+      "author": "Arduino",
+      "maintainer": "Arduino info@arduino.cc",
+      "sentence": "Allows playing audio files from an SD card. For Arduino DUE only.",
+      "paragraph": "With this library you can use the Arduino Due DAC outputs to play audio files.br /The audio files must be in the raw .wav format.",
+      "website": "http://arduino.cc/en/Reference/Audio",
+      "category": "Signal Input/Output",
+      "architectures": [
+        "sam"
+      ],
+      "types": [
+        "Arduino"
+      ],
+      "repository": "https://github.com/arduino-libraries/Audio.git",
+      "url": "http://downloads.arduino.cc/libraries/github.com/arduino-libraries/Audio-1.0.0.zip",
+      "archiveFileName": "Audio-1.0.0.zip",
+      "size": 6753,
+      "checksum": "SHA-256:a8e30ae581fbf15ad357c83a60c2ad3ebf93ef12e4a82a6cbd475a4eac6dc9d7"
+    }
+  ]
+}
