@@ -1039,6 +1039,8 @@ def get_contributor_count(repository_object):
 
 def create_output_file():
     """Do final formatting of the table. Write it as a tab separated file."""
+    print("\nNumber of libraries found: " + str(len(table)))
+
     # alphabetize table by the first column
     table.sort()
 
