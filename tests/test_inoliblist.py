@@ -200,7 +200,7 @@ class TestInoLibraryList(unittest.TestCase):
         # the row should have Column.count columns
         self.assertEqual(len(get_table()[0]), Column.count)
         # sanity check on the table heading text
-        self.assertEqual(get_table()[0][Column.repository_url], "Repository URL")
+        self.assertEqual(get_table()[0][Column.repository_url], "Repository URL \x1b \x1b")
 
     def test_process_library_manager_index(self):
         # open an abbreviated local copy of the Library Manager index
@@ -550,7 +550,7 @@ class TestInoLibraryList(unittest.TestCase):
         with open(file=output_filename, mode='r', encoding="utf-8") as csv_file:
             csv_data = csv.reader(csv_file, delimiter=output_file_delimiter, quotechar=output_file_quotechar)
             for row in csv_data:
-                self.assertEqual(row[Column.repository_url], "Repository URL")
+                self.assertEqual(row[Column.repository_url], "Repository URL \x1b \x1b")
 
 
 if __name__ == '__main__':
