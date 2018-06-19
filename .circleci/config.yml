@@ -1,0 +1,123 @@
+# This file is used to configure Circle CI to generate and publish the list
+
+# Circle CI version
+version: 2
+jobs:
+  test:
+    docker:
+      - image: circleci/python:3.6.5
+    working_directory: ~/repo
+    steps:
+      - checkout
+
+      - run:
+          name: Formatting checks
+          command: |
+            # Check for files starting with a blank line
+            find . -path './.git' -prune -prune -or -type f -print0 | xargs -0 -L1 bash -c 'head -1 "$0" | grep --binary-files=without-match --regexp="^$"; if [[ "$?" == "0" ]]; then echo "Blank line found at start of $0."; false; fi'
+            # Check for tabs
+            find . -path './.git' -prune -or -type f -exec grep --with-filename --line-number --binary-files=without-match --regexp=$'\t' '{}' \; -exec echo 'Tab found.' \; -exec false '{}' +
+            # Check for trailing whitespace
+            find . -path './.git' -prune -or -type f -exec grep --with-filename --line-number --binary-files=without-match --regexp='[[:blank:]]$' '{}' \; -exec echo 'Trailing whitespace found.' \; -exec false '{}' +
+            # Check for non-Unix line endings
+            find . -path './.git' -prune -or -type f -exec grep --files-with-matches --binary-files=without-match --regexp=$'\r$' '{}' \; -exec echo 'Non-Unix EOL detected.' \; -exec false '{}' +
+            # Check for blank lines at end of files
+            find . -path './.git' -prune -or -type f -print0 | xargs -0 -L1 bash -c 'tail -1 "$0" | grep --binary-files=without-match --regexp="^$"; if [[ "$?" == "0" ]]; then echo "Blank line found at end of $0."; false; fi'
+            # Check for files that don't end in a newline (https://stackoverflow.com/a/25686825)
+            find . -path './.git' -prune -or -type f -print0 | xargs -0 -L1 bash -c 'if test "$(grep --files-with-matches --binary-files=without-match --max-count=1 --regexp='.*' "$0")" && test "$(tail --bytes=1 "$0")"; then echo "No new line at end of $0."; false; fi'
+
+      - run:
+          name: Check for typos
+          command: |
+            git clone https://github.com/ss18/grep-typos.git "${HOME}/scripts/grep-typos"
+            find . -path "./.git" -prune -or -path './tests/data' -prune -or -type f -print0 | xargs --null --max-args=1 bash "${HOME}/scripts/grep-typos/grep_typos.sh" "$0"
+            rm "${HOME}/scripts/grep-typos" --recursive --force
+
+      - run:
+          name: Check PEP8 compliance
+          command: |
+            python3 -m venv venv
+            . venv/bin/activate
+            pip install pycodestyle
+            find . -path './.venv' -prune -name \*.py -exec pycodestyle {} +
+
+      - run:
+          name: Run unit tests
+          command: |
+            cd tests
+            python test_inoliblist.py --ghtoken $GITHUB_TOKEN
+
+
+  generate-list:
+    docker:
+      - image: circleci/python:3.6.5
+    working_directory: ~/repo
+    steps:
+      - checkout
+
+      - run:
+          name: Generate list
+          command: python inoliblist.py --ghtoken $GITHUB_TOKEN
+
+      - run:
+          name: Replace old list
+          command: |
+            # Rename the list file to avoid a conflict when switching to the gh-pages branch, which already contains the old file of that name
+            mv inoliblist.csv inoliblist_new.csv
+            git checkout gh-pages
+            # Replace the old list file with the new version
+            mv --force inoliblist_new.csv inoliblist.csv
+
+      - run:
+          name: Generate front end
+          command: |
+            python3 -m venv venv
+            . venv/bin/activate
+            pip install --upgrade csvtotable
+            csvtotable --overwrite --caption 'A list of Arduino libraries:' --delimiter $'\t' --quotechar '' --height 85% --pagination --virtual-scroll -1 inoliblist.csv index.html
+
+      - run:
+          name: Publish list
+          command: |
+            python --version
+            git add inoliblist.csv
+            git add index.html
+            git config user.email "per1234@nospam.me"
+            git config user.name "per1234"
+            git commit -m "Update list"
+            git config push.default simple
+            git push "https://${GITHUB_TOKEN}@github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}"
+
+
+workflows:
+  # Circle CI version
+  version: 2
+
+  on-push:
+    jobs:
+      - test:
+          filters:
+            branches:
+              ignore: gh-pages
+      - generate-list-manual-trigger:
+          type: approval
+          requires:
+            - test
+      - generate-list:
+          requires:
+            - generate-list-manual-trigger
+
+
+  weekly:
+    triggers:
+      - schedule:
+          # Run at midnight every Sunday
+          cron: "0 0 * * 0"
+          filters:
+            branches:
+              only: master
+    jobs:
+      - test
+      - generate-list:
+          requires:
+            - test
