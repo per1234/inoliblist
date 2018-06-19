@@ -4,6 +4,8 @@ import argparse
 import csv
 # for automatically generating unique column indexes
 import enum
+# for URL request errors
+import http.client
 # for parsing Library Manager index
 import json
 # for debug output
@@ -26,7 +28,10 @@ minutes_between_timeout_notifications = 5
 
 # retry urlopen after these HTTP error statuses
 # 403 error ("Forbidden") happens when API request allowance is exceeded
-urlopen_retry_on_http_error = ["403", "502", "503"]
+urlopen_retry_errors = ["HTTP Error 403: Forbidden",
+                        "HTTP Error 502: Bad Gateway",
+                        "HTTP Error 503: Service Unavailable",
+                        "Remote end closed connection without response"]
 # delay before retry after failed urlopen (seconds)
 urlopen_retry_delay = 60
 # maximum times to retry opening the URL before giving up
@@ -430,7 +435,7 @@ def get_json_from_url(url):
                         last_api_requests_remaining_value["core"] = int(url_data.info()["X-RateLimit-Remaining"])
 
                 return {"json_data": json_data, "additional_pages": additional_pages, "page_count": page_count}
-        except urllib.error.HTTPError as exception:
+        except (urllib.error.HTTPError, http.client.RemoteDisconnected) as exception:
             if not determine_urlopen_retry(exception=exception):
                 raise exception
 
@@ -443,14 +448,14 @@ def determine_urlopen_retry(exception):
     If so, delay then return True. Otherwise, return False.
 
     Keyword arguments:
-    exception -- the urllib.error.HTTPError exception
+    exception -- the exception
     """
     logger.info(str(exception.__class__.__name__) + ": " + str(exception))
-    for error_code in urlopen_retry_on_http_error:
-        if str(exception).startswith("HTTP Error " + error_code):
+    for error_code in urlopen_retry_errors:
+        if str(exception).startswith(error_code):
             # these errors may only be temporary, retry
             print("Temporarily unable to open URL (" + error_code + "), retrying")
-            if error_code == "403":
+            if error_code == "HTTP Error 403: Forbidden":
                 print("HTTP Error 403 may be encountered due to exceeding the GitHub API request allowance.")
                 print("Pass the script a GitHub personal API access token via the --ghtoken command line argument " +
                       "for a more generous allowance"
