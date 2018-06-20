@@ -84,6 +84,7 @@ class ColumnEnum(enum.IntEnum):
     fork_count = enum.auto()
     star_count = enum.auto()
     contributor_count = enum.auto()
+    tip_status = enum.auto()
     repository_license = enum.auto()
     repository_language = enum.auto()
     repository_description = enum.auto()
@@ -127,6 +128,7 @@ class Column:
     fork_count = int(ColumnEnum.fork_count)
     star_count = int(ColumnEnum.star_count)
     contributor_count = int(ColumnEnum.contributor_count)
+    tip_status = int(ColumnEnum.tip_status)
     repository_license = int(ColumnEnum.repository_license)
     repository_language = int(ColumnEnum.repository_language)
     repository_description = int(ColumnEnum.repository_description)
@@ -277,6 +279,7 @@ def initialize_table():
     table[0][Column.fork_count] = "#Forks \x1b \x1b"
     table[0][Column.star_count] = "#Stars \x1b \x1b"
     table[0][Column.contributor_count] = "#Contributors \x1b \x1b"
+    table[0][Column.tip_status] = "Status \x1b \x1b"
     table[0][Column.repository_license] = "License \x1b \x1b"
     table[0][Column.repository_language] = "Language \x1b \x1b"
     table[0][Column.repository_description] = "Repo Description \x1b \x1b"
@@ -635,6 +638,20 @@ def populate_row(repository_object, in_library_manager, verify):
     row_list[Column.fork_count] = str(repository_object["forks_count"])
     row_list[Column.star_count] = str(repository_object["stargazers_count"])
     row_list[Column.contributor_count] = get_contributor_count(repository_object=repository_object)
+
+    do_github_api_request_return = get_github_api_response(request="repos/" +
+                                                                   repository_object["full_name"] +
+                                                                   "/commits/" +
+                                                                   repository_object["default_branch"] +
+                                                                   "/status"
+                                                           )
+    status_data = dict(do_github_api_request_return["json_data"])
+    if str(status_data["state"]) != "pending":
+        row_list[Column.tip_status] = str(status_data["state"])
+    else:
+        # the term "pending" used by GitHub for commits with no status would be confusing
+        row_list[Column.tip_status] = ""
+
     row_list[Column.repository_license] = get_repository_license(repository_object=repository_object)
     row_list[Column.repository_language] = str(repository_object["language"])
 

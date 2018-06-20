@@ -31,6 +31,7 @@ An automatically generated list of thousands of [Arduino](http://arduino.cc) lib
 - **#Forks**: Number of forks of the repository. Note that this is forks of the repository specifically, as opposed to the "Fork" number shown on a repository's GitHub homepage, which is the total number of forks in the repository's network.
 - **#Stars**: Number of people who have "starred" the repository.
 - **#Contributors**: Number of people who have committed to the repository. Note: This doesn't always match the contributor count shown on the home page of GitHub repositories. It may be that number includes the contributors with private email addresses.
+- **Status**: Combined status of the latest commit to the default branch. Status will typically indicate the result of continuous integration checks.
 - **License**: Repository license as [detected by GitHub](https://help.github.com/articles/licensing-a-repository/) from a license file in the root of the repository. Note this does not necessarily guarantee all content in the repository has that license.
   - `none`: There is no license file.
   - `unrecognized: There is a license file but it did not match a standard license type.
