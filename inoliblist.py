@@ -43,7 +43,7 @@ results_per_page = 100
 # regular expressions for administrative files whitelist to use to determine whether subfolders should be searched
 # during library verification
 administrative_file_whitelist = ["^\..*",  # starts with .
-                                 "^.[^\.]*$",  # doesn't contain . anywhere except the first character
+                                 "^[^\.]*$",  # doesn't contain .
                                  "^.*\.md$",
                                  "^.*\.txt$",
                                  "^.*\.adoc$",
