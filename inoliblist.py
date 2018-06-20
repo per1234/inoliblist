@@ -40,6 +40,9 @@ urlopen_maximum_retries = 5
 # maximum number of results per API request (max allowed by GitHub is 100)
 results_per_page = 100
 
+# regular expressions fo subfolders to skip when searching the repository for a library
+library_subfolder_blacklist = ["^\..*", "data", "doc", "docs", "examples", "tests"]
+
 output_filename = "inoliblist.csv"
 output_file_delimiter = '\t'
 output_file_quotechar = None
@@ -760,7 +763,15 @@ def find_library_folder(repository_object, row_list, verify):
             # library not found in repo root but verification is off so search one subfolder down
             for root_directory_item in root_directory_listing:
                 # ignore folder names that start with .
-                if root_directory_item["type"] == "dir" and root_directory_item["name"][0] != '.':
+                if root_directory_item["type"] == "dir":
+
+                    # skip blacklisted subfolder names
+                    for blacklisted_subfolder_regex in library_subfolder_blacklist:
+                        blacklisted_subfolder_regex = re.compile(blacklisted_subfolder_regex)
+                        if blacklisted_subfolder_regex.fullmatch(root_directory_item["name"]):
+                            # the folder name matched the blacklist regular expression
+                            continue
+
                     page_number = 1
                     additional_pages = True
                     while additional_pages:
