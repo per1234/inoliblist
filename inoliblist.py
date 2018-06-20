@@ -339,7 +339,8 @@ def check_rate_limiting(api_type):
         # the rate_limit API does not use up the API request allotment so I can use get_json_from_url()
         json_data = dict(get_json_from_url(url="https://api.github.com/rate_limit")["json_data"])
 
-        last_api_requests_remaining_value[api_type] = json_data["resources"][api_type]["remaining"]
+        last_api_requests_remaining_value["core"] = json_data["resources"]["core"]["remaining"]
+        last_api_requests_remaining_value["search"] = json_data["resources"]["search"]["remaining"]
         rate_limiting_reset_time = json_data["resources"][api_type]["reset"]
 
         logger.info(api_type + " API request allotment: " + str(json_data["resources"][api_type]["limit"]))
