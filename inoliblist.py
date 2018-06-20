@@ -703,9 +703,8 @@ def find_library_folder(repository_object, row_list, verify):
     while additional_pages:
         try:
             do_github_api_request_return = get_github_api_response(request="repos/" +
-                                                                           repository_object["owner"][
-                                                                               "login"] + "/" +
-                                                                           repository_object["name"] + "/contents",
+                                                                           repository_object["full_name"] +
+                                                                           "/contents",
                                                                    page_number=page_number)
         except urllib.error.HTTPError:
             # a 404 error is returned for API requests for empty repositories
@@ -810,15 +809,9 @@ def find_library_folder(repository_object, row_list, verify):
                 while additional_pages:
                     try:
                         do_github_api_request_return = get_github_api_response(request="repos/" +
-                                                                                       repository_object[
-                                                                                           "owner"][
-                                                                                           "login"] +
-                                                                                       "/" +
-                                                                                       repository_object[
-                                                                                           "name"] +
+                                                                                       repository_object["full_name"] +
                                                                                        "/contents/" +
-                                                                                       root_directory_item[
-                                                                                           "name"],
+                                                                                       root_directory_item["name"],
                                                                                page_number=page_number)
                     except(json.decoder.JSONDecodeError, urllib.error.HTTPError, TimeoutError):
                         # I already know the repo is not empty but I don't know what would happen for an empty
