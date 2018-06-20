@@ -1043,7 +1043,12 @@ def get_contributor_count(repository_object):
 
 def create_output_file():
     """Do final formatting of the table. Write it as a tab separated file."""
-    print("\nNumber of libraries found: " + str(len(table)))
+    list_count = len(table) - 1
+    print("\nNumber of libraries found: " + str(list_count))
+    if list_count == 0:
+        logger.warning("Canceling output file creation because the list has no libraries.")
+        # no reason to write an empty file, and it might be overwriting a good one
+        return
 
     # alphabetize table by the first column
     table.sort()

@@ -1,5 +1,7 @@
 # must specify UTF-8 encoding due to the non-ASCII characters in the ArduinoJSON description
 # encoding: utf-8
+# for opening the output file
+import os
 # for making custom command line arguments work in conjunction with the unittest module
 import sys
 # for unit testing
@@ -546,11 +548,30 @@ class TestInoLibraryList(unittest.TestCase):
         self.assertEqual(get_contributor_count(repository_object=repository_object), '0')
 
     def test_create_output_file(self):
+        populate_row(repository_object=TestInoLibraryList.repository_object_sparkfun_phant_arduino["json_data"],
+                     in_library_manager=True,
+                     verify=False)
         create_output_file()
         with open(file=output_filename, mode='r', encoding="utf-8") as csv_file:
             csv_data = csv.reader(csv_file, delimiter=output_file_delimiter, quotechar=output_file_quotechar)
-            for row in csv_data:
-                self.assertEqual(row[Column.repository_url], "Repository URL \x1b \x1b")
+            # convert to list so specific rows can be accessed
+            csv_data = list(csv_data)
+        self.assertEqual(csv_data[0][Column.repository_url], "Repository URL \x1b \x1b")
+        self.assertEqual(csv_data[1][Column.repository_url], "https://github.com/sparkfun/phant-arduino")
+
+    def test_create_output_file_empty(self):
+        # remove existing file
+        try:
+            os.remove(output_filename)
+        except FileNotFoundError:
+            pass
+
+        create_output_file()
+
+        # create_output_file() should not write an output file with an empty list
+        with self.assertRaises(FileNotFoundError):
+            with open(file=output_filename, mode='r', encoding="utf-8"):
+                pass
 
 
 if __name__ == '__main__':
