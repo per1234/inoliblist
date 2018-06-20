@@ -398,7 +398,7 @@ def get_json_from_url(url):
                     json_data = json.loads(url_data.read().decode("utf-8", "ignore"))
                 except json.decoder.JSONDecodeError as exception:
                     # output some information on the exception
-                    logger.info(str(exception.__class__.__name__) + ": " + str(exception))
+                    logger.warning(str(exception.__class__.__name__) + ": " + str(exception))
                     # pass on the exception to the caller
                     raise exception
 
