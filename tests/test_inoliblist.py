@@ -258,7 +258,7 @@ class TestInoLibraryList(unittest.TestCase):
         url = "https://api.github.com/repos/triatebr/aprenda-arduino/contents/Arduino -CodeIOT 19-05-2015"
         url = normalize_url(url=url)
         # without normalization this will give a 400 error
-        with urllib.request.urlopen(url) as _:
+        with urllib.request.urlopen(url):
             pass
 
     def test_normalize_url_non_ascii_character(self):
@@ -268,7 +268,7 @@ class TestInoLibraryList(unittest.TestCase):
         url = normalize_url(url=url)
         # without normalization this will cause an exception:
         # UnicodeEncodeError: 'ascii' codec can't encode character '\xe3' in position 57: ordinal not in range(128)
-        with urllib.request.urlopen(url) as _:
+        with urllib.request.urlopen(url):
             pass
 
     def test_normalize_url_redundant_slashes(self):
