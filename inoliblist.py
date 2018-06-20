@@ -543,6 +543,11 @@ def search_repositories(search_query, created_argument_list, fork_argument, veri
                                                                                       "&sort=forks&order=desc",
                                                                    page_number=page_number)
             json_data = dict(do_github_api_request_return["json_data"])
+
+            if json_data["incomplete_results"]:
+                logger.warning("Search results are incomplete due to a timeout. " +
+                               "See: https://developer.github.com/v3/search/#timeouts-and-incomplete-results")
+
             additional_pages = do_github_api_request_return["additional_pages"]
             page_number += 1
             for repository_object in json_data["items"]:
