@@ -136,6 +136,7 @@ class TestInoLibraryList(unittest.TestCase):
     # header:Joystick/src
     # sketch in root:n
     # examples folder in root:n
+    # only administrative files in root:n
     # license:LGPL-3.0
     # contributor count:2
     repository_object_mheironimus_arduinojoysticklibrary = get_json_from_url(
@@ -150,6 +151,7 @@ class TestInoLibraryList(unittest.TestCase):
     # header:firmware
     # sketch in root:n
     # examples folder in root:n
+    # only administrative files in root:n
     # license:MIT
     # contributor count:1
     repository_object_menan_sparkjson = get_json_from_url(url="https://api.github.com/repos/menan/SparkJson"
@@ -181,6 +183,22 @@ class TestInoLibraryList(unittest.TestCase):
     # contributor count:9
     repository_object_bblanchon_arduinojson = get_json_from_url(
         url="https://api.github.com/repos/bblanchon/ArduinoJson"
+    )
+
+    # https://github.com/going-digital/Talkie
+    # folder count:1
+    # archived:n
+    # active:n
+    # library.properties:n
+    # library.json:m
+    # header:Talkie
+    # sketch in root:n
+    # examples folder in root:n
+    # only administrative files in root:y
+    # license:n
+    # contributor count:2
+    repository_object_going_digital_talkie = get_json_from_url(
+        url="https://api.github.com/repos/going-digital/Talkie"
     )
 
     def setUp(self):
@@ -455,6 +473,15 @@ class TestInoLibraryList(unittest.TestCase):
         repository_object = TestInoLibraryList.repository_object_mheironimus_arduinojoysticklibrary["json_data"]
         row_list = [""] * Column.count
         self.assertIsNone(find_library_folder(repository_object=repository_object, row_list=row_list, verify=True))
+
+    def test_find_library_folder_verify_only_administrative_files_in_root(self):
+        # requirements: only administrative files in root, library in subfolder
+        repository_object = TestInoLibraryList.repository_object_going_digital_talkie["json_data"]
+        row_list = [""] * Column.count
+        self.assertEqual(
+            find_library_folder(repository_object=repository_object, row_list=row_list, verify=True),
+            "Talkie"
+        )
 
     def test_parse_library_dot_properties_success(self):
         # requirements: library.properties

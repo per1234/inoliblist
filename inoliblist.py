@@ -40,6 +40,17 @@ urlopen_maximum_retries = 5
 # maximum number of results per API request (max allowed by GitHub is 100)
 results_per_page = 100
 
+# regular expressions for administrative files whitelist to use to determine whether subfolders should be searched
+# during library verification
+administrative_file_whitelist = ["^\..*",  # starts with .
+                                 "^.[^\.]*$",  # doesn't contain . anywhere except the first character
+                                 "^.*\.md$",
+                                 "^.*\.txt$",
+                                 "^.*\.adoc$",
+                                 "^.*\.txt$",
+                                 "^platformio.ini$"
+                                 ]
+
 # regular expressions fo subfolders to skip when searching the repository for a library
 library_subfolder_blacklist = ["^\..*", "data", "doc", "docs", "examples", "tests"]
 
@@ -718,6 +729,7 @@ def find_library_folder(repository_object, row_list, verify):
         header_file_in_root = False
         sketch_file_in_root = False
         examples_folder_in_root = False
+        only_administrative_files_in_root = True
 
         for root_directory_item in root_directory_listing:
             # check for header files in repo root
@@ -732,12 +744,21 @@ def find_library_folder(repository_object, row_list, verify):
             # these checks are only required for verification
             if verify:
                 # check for sketch files in repo root
-                if root_directory_item["type"] == "file" and len(
-                        root_directory_item["name"].split('.')) > 1 and (
-                        root_directory_item["name"].endswith(".ino") or
-                        root_directory_item["name"].endswith(".pde")
-                ):
-                    sketch_file_in_root = True
+                if root_directory_item["type"] == "file":
+                    if (
+                            root_directory_item["name"].endswith(".ino") or
+                            root_directory_item["name"].endswith(".pde")
+                    ):
+                        sketch_file_in_root = True
+
+                    is_whitelisted_file = False
+                    for administrative_file_regex in administrative_file_whitelist:
+                        administrative_file_regex = re.compile(administrative_file_regex)
+                        if administrative_file_regex.fullmatch(root_directory_item["name"]):
+                            is_whitelisted_file = True
+                    if not is_whitelisted_file:
+                        logger.warning("non-administrative file found in root: " + str(root_directory_item["name"]))
+                        only_administrative_files_in_root = False
                 # check for examples folder in repo root
                 elif root_directory_item["type"] == "dir" and (
                         root_directory_item["name"] == "examples" or
@@ -755,89 +776,91 @@ def find_library_folder(repository_object, row_list, verify):
             # - has header file and no sketch file in root
             # - has header file and examples (or some variant) folder in root
 
-            if (header_file_in_root is False or (
-                    header_file_in_root is True and
-                    sketch_file_in_root is True and
-                    examples_folder_in_root is False)):
-                # header file not found in the repo root
+            if header_file_in_root is False and only_administrative_files_in_root is True:
+                # only administrative files were found in the root so check the subfolders too
+                pass
+            elif header_file_in_root is True and sketch_file_in_root is False:
+                # verification passed
+                return "/"
+            elif header_file_in_root is True and sketch_file_in_root is True and examples_folder_in_root is True:
+                # verification passed
+                return "/"
+            else:
+                # verification failed
                 logger.info(
                     "Skipping (no library found in repo root): " + repository_object["html_url"])
                 return None
-            else:
-                # verification passed
-                return "/"
         elif header_file_in_root:
             # if verification is off then just finding a header file is enough, even if there's a sketch file also
             return "/"
-        else:
-            # library not found in repo root but verification is off so search one subfolder down
-            for root_directory_item in root_directory_listing:
-                # ignore folder names that start with .
-                if root_directory_item["type"] == "dir":
 
-                    # skip blacklisted subfolder names
-                    for blacklisted_subfolder_regex in library_subfolder_blacklist:
-                        blacklisted_subfolder_regex = re.compile(blacklisted_subfolder_regex)
-                        if blacklisted_subfolder_regex.fullmatch(root_directory_item["name"]):
-                            # the folder name matched the blacklist regular expression
-                            continue
+        # library not found in repo root but so search one subfolder down
+        for root_directory_item in root_directory_listing:
+            # ignore folder names that start with .
+            if root_directory_item["type"] == "dir":
+                # skip blacklisted subfolder names
+                for blacklisted_subfolder_regex in library_subfolder_blacklist:
+                    blacklisted_subfolder_regex = re.compile(blacklisted_subfolder_regex)
+                    if blacklisted_subfolder_regex.fullmatch(root_directory_item["name"]):
+                        # the folder name matched the blacklist regular expression
+                        continue
 
-                    page_number = 1
-                    additional_pages = True
-                    while additional_pages:
-                        try:
-                            do_github_api_request_return = get_github_api_response(request="repos/" +
-                                                                                           repository_object[
-                                                                                               "owner"][
-                                                                                               "login"] +
-                                                                                           "/" +
-                                                                                           repository_object[
-                                                                                               "name"] +
-                                                                                           "/contents/" +
-                                                                                           root_directory_item[
-                                                                                               "name"],
-                                                                                   page_number=page_number)
-                        except(json.decoder.JSONDecodeError, urllib.error.HTTPError, TimeoutError):
-                            # I already know the repo is not empty but I don't know what would happen for an empty
-                            # directory since Git doesn't currently support them:
-                            # https://git.wiki.kernel.org/index.php/GitFaq#Can_I_add_empty_directories.3F
-                            # but I'll assume it would be a 404, which will cause get_github_api_response to return None
-                            logger.warning(
-                                "Something went wrong during API request for contents of " + root_directory_item[
-                                    "name"] + " folder. Moving on to the next folder...")
-                            break
-                        subdirectory_listing = list(do_github_api_request_return["json_data"])
-                        additional_pages = do_github_api_request_return["additional_pages"]
-                        page_number += 1
+                page_number = 1
+                additional_pages = True
+                while additional_pages:
+                    try:
+                        do_github_api_request_return = get_github_api_response(request="repos/" +
+                                                                                       repository_object[
+                                                                                           "owner"][
+                                                                                           "login"] +
+                                                                                       "/" +
+                                                                                       repository_object[
+                                                                                           "name"] +
+                                                                                       "/contents/" +
+                                                                                       root_directory_item[
+                                                                                           "name"],
+                                                                               page_number=page_number)
+                    except(json.decoder.JSONDecodeError, urllib.error.HTTPError, TimeoutError):
+                        # I already know the repo is not empty but I don't know what would happen for an empty
+                        # directory since Git doesn't currently support them:
+                        # https://git.wiki.kernel.org/index.php/GitFaq#Can_I_add_empty_directories.3F
+                        # but I'll assume it would be a 404, which will cause get_github_api_response to return None
+                        logger.warning(
+                            "Something went wrong during API request for contents of " + root_directory_item[
+                                "name"] + " folder. Moving on to the next folder...")
+                        break
+                    subdirectory_listing = list(do_github_api_request_return["json_data"])
+                    additional_pages = do_github_api_request_return["additional_pages"]
+                    page_number += 1
 
-                        # don't return until all the files in the subfolder is scanned
-                        # (because we want to parse metadata)
-                        # so a variable is needed to store the library folder
-                        library_folder = None
-                        for subdirectory_item in subdirectory_listing:
-                            # check for header files
-                            if subdirectory_item["type"] == "file" and len(
-                                    subdirectory_item["name"].split('.')) > 1 and (
-                                    subdirectory_item["name"].endswith(".h") or
-                                    subdirectory_item["name"].endswith(".hh") or
-                                    subdirectory_item["name"].endswith(".hpp")
-                            ):
-                                library_folder = root_directory_item["name"]
-                            # check for metadata files
-                            elif (subdirectory_item["type"] == "file" and
-                                  subdirectory_item["name"] == "library.properties"):
-                                parse_library_dot_properties(metadata_folder=root_directory_item["name"],
-                                                             repository_object=repository_object,
-                                                             row_list=row_list)
-                                library_folder = root_directory_item["name"]
-                            elif subdirectory_item["type"] == "file" and subdirectory_item["name"] == "library.json":
-                                parse_library_dot_json(metadata_folder=root_directory_item["name"],
-                                                       repository_object=repository_object,
-                                                       row_list=row_list)
-                                library_folder = root_directory_item["name"]
-                        if library_folder is not None:
-                            # all items in subfolder were checked and a library was detected
-                            return library_folder
+                    # don't return until all the files in the subfolder is scanned
+                    # (because we want to parse metadata)
+                    # so a variable is needed to store the library folder
+                    library_folder = None
+                    for subdirectory_item in subdirectory_listing:
+                        # check for header files
+                        if subdirectory_item["type"] == "file" and len(
+                                subdirectory_item["name"].split('.')) > 1 and (
+                                subdirectory_item["name"].endswith(".h") or
+                                subdirectory_item["name"].endswith(".hh") or
+                                subdirectory_item["name"].endswith(".hpp")
+                        ):
+                            library_folder = root_directory_item["name"]
+                        # check for metadata files
+                        elif (subdirectory_item["type"] == "file" and
+                              subdirectory_item["name"] == "library.properties"):
+                            parse_library_dot_properties(metadata_folder=root_directory_item["name"],
+                                                         repository_object=repository_object,
+                                                         row_list=row_list)
+                            library_folder = root_directory_item["name"]
+                        elif subdirectory_item["type"] == "file" and subdirectory_item["name"] == "library.json":
+                            parse_library_dot_json(metadata_folder=root_directory_item["name"],
+                                                   repository_object=repository_object,
+                                                   row_list=row_list)
+                            library_folder = root_directory_item["name"]
+                    if library_folder is not None:
+                        # all items in subfolder were checked and a library was detected
+                        return library_folder
     # library folder not found
     return None
 
