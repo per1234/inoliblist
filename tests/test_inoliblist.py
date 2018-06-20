@@ -556,8 +556,7 @@ class TestInoLibraryList(unittest.TestCase):
             csv_data = csv.reader(csv_file, delimiter=output_file_delimiter, quotechar=output_file_quotechar)
             # convert to list so specific rows can be accessed
             csv_data = list(csv_data)
-        self.assertEqual(csv_data[0][Column.repository_url], "Repository URL \x1b \x1b")
-        self.assertEqual(csv_data[1][Column.repository_url], "https://github.com/sparkfun/phant-arduino")
+        self.assertEqual(csv_data, get_table())
 
     def test_create_output_file_empty(self):
         # remove existing file
