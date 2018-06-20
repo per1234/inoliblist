@@ -561,15 +561,20 @@ def search_repositories(search_query, created_argument_list, fork_argument, veri
                 #                                             )["json_data"]
                 populate_row(repository_object=repository_object, in_library_manager=False, verify=verify)
 
+            if not additional_pages and search_results_count < json_data["total_count"]:
+                # GitHub's search API provides data for a maximum of 1000 search results
+                # https://developer.github.com/v3/search/#about-the-search-api
+                # to work around this I have broken the searches into created date segments
+                # but these will need to be updated over time as more repositories are added that match the searches
+                logger.warning(
+                    "Maximum search results count reached for search segment: " + created_argument +
+                    " in query: " + search_query
+                )
+
         logger.info("Found " + str(search_results_count) +
                     " search results for search segment: " + created_argument +
                     " in query: " + search_query
                     )
-        if search_results_count == 1000:
-            print(
-                "WARNING: Maximum search results count reached for search segment: " + created_argument +
-                " in query: " + search_query
-            )
 
 
 def populate_row(repository_object, in_library_manager, verify):
