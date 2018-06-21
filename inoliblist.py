@@ -754,7 +754,7 @@ def find_library_folder(repository_object, row_list, verify):
 
         # I need to cast this to list to fix the PyCharm code inspector warnings:
         # "Expected type 'Union[int, slice]',got 'str' instead"
-        root_directory_listing = list(do_github_api_request_return["json_data"])
+        root_folder_listing = list(do_github_api_request_return["json_data"])
         additional_pages = do_github_api_request_return["additional_pages"]
         page_number += 1
 
@@ -763,36 +763,36 @@ def find_library_folder(repository_object, row_list, verify):
         examples_folder_in_root = False
         only_administrative_files_in_root = True
 
-        for root_directory_item in root_directory_listing:
+        for root_folder_item in root_folder_listing:
             # check for header files in repo root
-            if root_directory_item["type"] == "file":
+            if root_folder_item["type"] == "file":
                 for header_file_extension in header_file_extensions:
-                    if root_directory_item["name"].endswith(str(header_file_extension)):
+                    if root_folder_item["name"].endswith(str(header_file_extension)):
                         header_file_in_root = True
                         # there's a header file in the repo root but no metadata files
                         break
             # these checks are only required for verification
             if verify:
                 # check for sketch files in repo root
-                if root_directory_item["type"] == "file":
+                if root_folder_item["type"] == "file":
                     if (
-                            root_directory_item["name"].endswith(".ino") or
-                            root_directory_item["name"].endswith(".pde")
+                            root_folder_item["name"].endswith(".ino") or
+                            root_folder_item["name"].endswith(".pde")
                     ):
                         sketch_file_in_root = True
 
                     is_administrative_file = False
                     for administrative_file_regex in administrative_file_whitelist:
                         administrative_file_regex = re.compile(administrative_file_regex)
-                        if administrative_file_regex.fullmatch(root_directory_item["name"]):
+                        if administrative_file_regex.fullmatch(root_folder_item["name"]):
                             is_administrative_file = True
                             break
                     if not is_administrative_file:
                         only_administrative_files_in_root = False
                 # check for examples folder in repo root
-                elif root_directory_item["type"] == "dir":
+                elif root_folder_item["type"] == "dir":
                     for examples_folder_name in examples_folder_names:
-                        if root_directory_item["name"] == str(examples_folder_name):
+                        if root_folder_item["name"] == str(examples_folder_name):
                             examples_folder_in_root = True
                             break
 
@@ -822,13 +822,13 @@ def find_library_folder(repository_object, row_list, verify):
             return "/"
 
         # library not found in repo root but so search one subfolder down
-        for root_directory_item in root_directory_listing:
+        for root_folder_item in root_folder_listing:
             # ignore folder names that start with .
-            if root_directory_item["type"] == "dir":
+            if root_folder_item["type"] == "dir":
                 # skip blacklisted subfolder names
                 for blacklisted_subfolder_regex in library_subfolder_blacklist:
                     blacklisted_subfolder_regex = re.compile(blacklisted_subfolder_regex)
-                    if blacklisted_subfolder_regex.fullmatch(root_directory_item["name"]):
+                    if blacklisted_subfolder_regex.fullmatch(root_folder_item["name"]):
                         # the folder name matched the blacklist regular expression
                         continue
 
@@ -839,18 +839,18 @@ def find_library_folder(repository_object, row_list, verify):
                         do_github_api_request_return = get_github_api_response(request="repos/" +
                                                                                        repository_object["full_name"] +
                                                                                        "/contents/" +
-                                                                                       root_directory_item["name"],
+                                                                                       root_folder_item["name"],
                                                                                page_number=page_number)
                     except(json.decoder.JSONDecodeError, urllib.error.HTTPError, TimeoutError):
                         # I already know the repo is not empty but I don't know what would happen for an empty
-                        # directory since Git doesn't currently support them:
+                        # folder since Git doesn't currently support them:
                         # https://git.wiki.kernel.org/index.php/GitFaq#Can_I_add_empty_directories.3F
                         # but I'll assume it would be a 404, which will cause get_github_api_response to return None
                         logger.warning(
-                            "Something went wrong during API request for contents of " + root_directory_item[
+                            "Something went wrong during API request for contents of " + root_folder_item[
                                 "name"] + " folder. Moving on to the next folder...")
                         break
-                    subdirectory_listing = list(do_github_api_request_return["json_data"])
+                    subfolder_listing = list(do_github_api_request_return["json_data"])
                     additional_pages = do_github_api_request_return["additional_pages"]
                     page_number += 1
 
@@ -858,24 +858,24 @@ def find_library_folder(repository_object, row_list, verify):
                     # (because we want to parse metadata)
                     # so a variable is needed to store the library folder
                     library_folder = None
-                    for subdirectory_item in subdirectory_listing:
-                        if subdirectory_item["type"] == "file":
+                    for subfolder_item in subfolder_listing:
+                        if subfolder_item["type"] == "file":
                             # check for metadata files
-                            if subdirectory_item["name"] == "library.properties":
-                                parse_library_dot_properties(metadata_folder=root_directory_item["name"],
+                            if subfolder_item["name"] == "library.properties":
+                                parse_library_dot_properties(metadata_folder=root_folder_item["name"],
                                                              repository_object=repository_object,
                                                              row_list=row_list)
-                                library_folder = root_directory_item["name"]
-                            elif subdirectory_item["name"] == "library.json":
-                                parse_library_dot_json(metadata_folder=root_directory_item["name"],
+                                library_folder = root_folder_item["name"]
+                            elif subfolder_item["name"] == "library.json":
+                                parse_library_dot_json(metadata_folder=root_folder_item["name"],
                                                        repository_object=repository_object,
                                                        row_list=row_list)
-                                library_folder = root_directory_item["name"]
+                                library_folder = root_folder_item["name"]
                             else:
                                 # check for header files
                                 for header_file_extension in header_file_extensions:
-                                    if subdirectory_item["name"].endswith(str(header_file_extension)):
-                                        library_folder = root_directory_item["name"]
+                                    if subfolder_item["name"].endswith(str(header_file_extension)):
+                                        library_folder = root_folder_item["name"]
                                         break
                     if library_folder is not None:
                         # all items in subfolder were checked and a library was detected
