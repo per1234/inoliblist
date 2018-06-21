@@ -376,6 +376,7 @@ def check_rate_limiting(api_type):
 
         logger.info(api_type + " API request allotment: " + str(json_data["resources"][api_type]["limit"]))
         logger.info("Remaining " + api_type + " API requests: " + str(last_api_requests_remaining_value[api_type]))
+        logger.info(api_type + " API rate limiting reset time: " + str(rate_limiting_reset_time))
 
         if last_api_requests_remaining_value[api_type] == 0:
             # API request allowance is used up
