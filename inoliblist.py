@@ -772,11 +772,15 @@ def find_library_folder(repository_object, row_list, verify):
     for root_folder_item in root_folder_listing:
         if root_folder_item["type"] == "dir":
             # skip blacklisted subfolder names
+            folder_is_blacklisted = False
             for blacklisted_subfolder_regex in library_subfolder_blacklist:
                 blacklisted_subfolder_regex = re.compile(blacklisted_subfolder_regex)
                 if blacklisted_subfolder_regex.fullmatch(root_folder_item["name"]):
                     # the folder name matched the blacklist regular expression
-                    continue
+                    folder_is_blacklisted = True
+                    break
+            if folder_is_blacklisted:
+                continue
 
             # get a listing of the subfolder contents
             page_number = 1
