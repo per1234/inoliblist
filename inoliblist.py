@@ -23,8 +23,10 @@ import urllib.request
 
 # configuration parameters:
 
-# interval between printing GitHub API timeout wait messages
-minutes_between_timeout_notifications = 5
+# (s) interval between printing GitHub API rate limit reset wait messages
+rate_limit_reset_wait_notification_interval = 300
+# (s) delay after rate limit reset time to make sure it has actually reset before the next API request
+rate_limit_reset_wait_additional_delay = 180
 
 # retry urlopen after these HTTP error statuses
 # 403 error ("Forbidden") happens when API request allowance is exceeded
@@ -358,7 +360,7 @@ def check_rate_limiting(api_type):
 
         last_api_requests_remaining_value["core"] = json_data["resources"]["core"]["remaining"]
         last_api_requests_remaining_value["search"] = json_data["resources"]["search"]["remaining"]
-        rate_limiting_reset_time = json_data["resources"][api_type]["reset"]
+        rate_limiting_reset_time = json_data["resources"][api_type]["reset"] + rate_limit_reset_wait_additional_delay
 
         logger.info(api_type + " API request allotment: " + str(json_data["resources"][api_type]["limit"]))
         logger.info("Remaining " + api_type + " API requests: " + str(last_api_requests_remaining_value[api_type]))
@@ -372,7 +374,7 @@ def check_rate_limiting(api_type):
             notification_timestamp = 0
             while time.time() < rate_limiting_reset_time:
                 # print a periodic message while waiting for the API timeout to indicate the script is still alive
-                if (time.time() - notification_timestamp) > (minutes_between_timeout_notifications * 60):
+                if (time.time() - notification_timestamp) > rate_limit_reset_wait_notification_interval:
                     print(
                         "GitHub " + api_type + " API request limit reached. Time before limit reset: " +
                         str(int((rate_limiting_reset_time - time.time()) / 60)) + " minutes"
