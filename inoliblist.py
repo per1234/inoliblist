@@ -53,6 +53,9 @@ administrative_file_whitelist = ["^\..*",  # starts with .
                                  "^platformio.ini$"
                                  ]
 
+# library header file extensions recognized by the Arduino IDE
+header_file_extensions = [".h", ".hh", ".hpp"]
+
 # regular expressions fo subfolders to skip when searching the repository for a library
 library_subfolder_blacklist = ["^\..*", "data", "doc", "docs", "examples", "tests"]
 
@@ -751,14 +754,12 @@ def find_library_folder(repository_object, row_list, verify):
 
         for root_directory_item in root_directory_listing:
             # check for header files in repo root
-            if root_directory_item["type"] == "file" and len(
-                    root_directory_item["name"].split('.')) > 1 and (
-                    root_directory_item["name"].endswith(".h") or
-                    root_directory_item["name"].endswith(".hh") or
-                    root_directory_item["name"].endswith(".hpp")
-            ):
-                # there's a header file in the repo root but no metadata files
-                header_file_in_root = True
+            if root_directory_item["type"] == "file":
+                for header_file_extension in header_file_extensions:
+                    if root_directory_item["name"].endswith(str(header_file_extension)):
+                        header_file_in_root = True
+                        # there's a header file in the repo root but no metadata files
+                        break
             # these checks are only required for verification
             if verify:
                 # check for sketch files in repo root
@@ -850,26 +851,24 @@ def find_library_folder(repository_object, row_list, verify):
                     # so a variable is needed to store the library folder
                     library_folder = None
                     for subdirectory_item in subdirectory_listing:
-                        # check for header files
-                        if subdirectory_item["type"] == "file" and len(
-                                subdirectory_item["name"].split('.')) > 1 and (
-                                subdirectory_item["name"].endswith(".h") or
-                                subdirectory_item["name"].endswith(".hh") or
-                                subdirectory_item["name"].endswith(".hpp")
-                        ):
-                            library_folder = root_directory_item["name"]
-                        # check for metadata files
-                        elif (subdirectory_item["type"] == "file" and
-                              subdirectory_item["name"] == "library.properties"):
-                            parse_library_dot_properties(metadata_folder=root_directory_item["name"],
-                                                         repository_object=repository_object,
-                                                         row_list=row_list)
-                            library_folder = root_directory_item["name"]
-                        elif subdirectory_item["type"] == "file" and subdirectory_item["name"] == "library.json":
-                            parse_library_dot_json(metadata_folder=root_directory_item["name"],
-                                                   repository_object=repository_object,
-                                                   row_list=row_list)
-                            library_folder = root_directory_item["name"]
+                        if subdirectory_item["type"] == "file":
+                            # check for metadata files
+                            if subdirectory_item["name"] == "library.properties":
+                                parse_library_dot_properties(metadata_folder=root_directory_item["name"],
+                                                             repository_object=repository_object,
+                                                             row_list=row_list)
+                                library_folder = root_directory_item["name"]
+                            elif subdirectory_item["name"] == "library.json":
+                                parse_library_dot_json(metadata_folder=root_directory_item["name"],
+                                                       repository_object=repository_object,
+                                                       row_list=row_list)
+                                library_folder = root_directory_item["name"]
+                            else:
+                                # check for header files
+                                for header_file_extension in header_file_extensions:
+                                    if subdirectory_item["name"].endswith(str(header_file_extension)):
+                                        library_folder = root_directory_item["name"]
+                                        break
                     if library_folder is not None:
                         # all items in subfolder were checked and a library was detected
                         return library_folder
