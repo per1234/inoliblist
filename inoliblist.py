@@ -492,11 +492,10 @@ def determine_urlopen_retry(exception):
             # these errors may only be temporary, retry
             print("Temporarily unable to open URL (" + error_code + "), retrying")
             if error_code == "HTTP Error 403: Forbidden":
-                print("HTTP Error 403 may be caused by exceeding the GitHub API request allowance.")
-                print("Pass the script a GitHub personal API access token via the --ghtoken command line argument " +
-                      "for a more generous allowance"
-                      )
-                print("https://blog.github.com/2013-05-16-personal-api-tokens/")
+                # ideally this would only be done if the URL opened was api.github.com and use the correct API type but
+                # it should do no real harm as is
+                check_rate_limiting(api_type="core")
+                check_rate_limiting(api_type="search")
             time.sleep(urlopen_retry_delay)
             return True
     else:
