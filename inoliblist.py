@@ -635,6 +635,7 @@ def populate_row(repository_object, in_library_manager, verify):
     if library_folder is None:
         if verify:
             # verification is required and a library was not found so skip the repo
+            logger.info("Skipping (library verification failed)")
             return
         library_folder = ""
 
@@ -730,9 +731,10 @@ def find_library_folder(repository_object, row_list, verify):
         return library_folder
 
     # metadata file was not found in the repo root folder
+    # get a listing of the root folder contents
     page_number = 1
     additional_pages = True
-    # scan the contents of the root folder to determine if it contains a library
+    root_folder_listing = []
     while additional_pages:
         try:
             do_github_api_request_return = get_github_api_response(request="repos/" +
@@ -752,136 +754,156 @@ def find_library_folder(repository_object, row_list, verify):
                 logger.info("Adding repository to list with unknown library folder.")
                 return None
 
-        # I need to cast this to list to fix the PyCharm code inspector warnings:
-        # "Expected type 'Union[int, slice]',got 'str' instead"
-        root_folder_listing = list(do_github_api_request_return["json_data"])
-        additional_pages = do_github_api_request_return["additional_pages"]
         page_number += 1
+        additional_pages = do_github_api_request_return["additional_pages"]
+        root_folder_listing += list(do_github_api_request_return["json_data"])
 
-        header_file_in_root = False
-        sketch_file_in_root = False
-        examples_folder_in_root = False
-        only_administrative_files_in_root = True
+    library_found = find_library(folder_listing=root_folder_listing, verify=verify)
+    if library_found:
+        return "/"
+    if verify:
+        if library_found is None:
+            # check subfolders
+            pass
+        elif not library_found:
+            return None
 
-        for root_folder_item in root_folder_listing:
-            # check for header files in repo root
-            if root_folder_item["type"] == "file":
-                for header_file_extension in header_file_extensions:
-                    if root_folder_item["name"].endswith(str(header_file_extension)):
-                        header_file_in_root = True
-                        # there's a header file in the repo root but no metadata files
-                        break
-            # these checks are only required for verification
-            if verify:
-                # check for sketch files in repo root
-                if root_folder_item["type"] == "file":
-                    if (
-                            root_folder_item["name"].endswith(".ino") or
-                            root_folder_item["name"].endswith(".pde")
-                    ):
-                        sketch_file_in_root = True
+    # library not found in repo root but so search one subfolder down
+    for root_folder_item in root_folder_listing:
+        if root_folder_item["type"] == "dir":
+            # skip blacklisted subfolder names
+            for blacklisted_subfolder_regex in library_subfolder_blacklist:
+                blacklisted_subfolder_regex = re.compile(blacklisted_subfolder_regex)
+                if blacklisted_subfolder_regex.fullmatch(root_folder_item["name"]):
+                    # the folder name matched the blacklist regular expression
+                    continue
 
-                    is_administrative_file = False
-                    for administrative_file_regex in administrative_file_whitelist:
-                        administrative_file_regex = re.compile(administrative_file_regex)
-                        if administrative_file_regex.fullmatch(root_folder_item["name"]):
-                            is_administrative_file = True
-                            break
-                    if not is_administrative_file:
-                        only_administrative_files_in_root = False
-                # check for examples folder in repo root
-                elif root_folder_item["type"] == "dir":
-                    for examples_folder_name in examples_folder_names:
-                        if root_folder_item["name"] == str(examples_folder_name):
-                            examples_folder_in_root = True
-                            break
+            # get a listing of the subfolder contents
+            page_number = 1
+            additional_pages = True
+            subfolder_listing = []
+            while additional_pages:
+                try:
+                    do_github_api_request_return = get_github_api_response(request="repos/" +
+                                                                                   repository_object["full_name"] +
+                                                                                   "/contents/" +
+                                                                                   root_folder_item["name"],
+                                                                           page_number=page_number)
+                except(json.decoder.JSONDecodeError, urllib.error.HTTPError, TimeoutError):
+                    # I already know the repo is not empty but I don't know what would happen for an empty
+                    # folder since Git doesn't currently support them:
+                    # https://git.wiki.kernel.org/index.php/GitFaq#Can_I_add_empty_directories.3F
+                    # but I'll assume it would be a 404, which will cause get_github_api_response to return None
+                    logger.warning(
+                        "Something went wrong during API request for contents of " + root_folder_item[
+                            "name"] + " folder. Moving on to the next folder...")
+                    break
 
-        if verify:
-            # to pass verification, the repo must meet one of the following:
-            # - has metadata file in root (already checked above and they are not present)
-            # - has header file and no sketch file in root
-            # - has header file and examples (or some variant) folder in root
-            # - has only administrative files in the root and a subfolder meets one of the above
+                page_number += 1
+                additional_pages = do_github_api_request_return["additional_pages"]
+                subfolder_listing += list(do_github_api_request_return["json_data"])
 
-            if header_file_in_root is True and sketch_file_in_root is False:
-                # verification passed
-                return "/"
-            elif header_file_in_root is True and sketch_file_in_root is True and examples_folder_in_root is True:
-                # verification passed
-                return "/"
-            elif header_file_in_root is False and only_administrative_files_in_root is True:
-                # only administrative files were found in the root so check the subfolders too
-                pass
-            else:
-                # verification failed
-                logger.info(
-                    "Skipping (no library found in repo root): " + repository_object["html_url"])
-                return None
-        elif header_file_in_root:
-            # if verification is off then just finding a header file is enough, even if there's a sketch file also
-            return "/"
+            if find_library(folder_listing=subfolder_listing, verify=verify):
+                # library was found in this folder
+                # parse metadata files if present
+                parse_library_dot_properties(metadata_folder=root_folder_item["name"],
+                                             repository_object=repository_object,
+                                             row_list=row_list)
+                parse_library_dot_json(metadata_folder=root_folder_item["name"],
+                                       repository_object=repository_object,
+                                       row_list=row_list)
+                return root_folder_item["name"]
 
-        # library not found in repo root but so search one subfolder down
-        for root_folder_item in root_folder_listing:
-            # ignore folder names that start with .
-            if root_folder_item["type"] == "dir":
-                # skip blacklisted subfolder names
-                for blacklisted_subfolder_regex in library_subfolder_blacklist:
-                    blacklisted_subfolder_regex = re.compile(blacklisted_subfolder_regex)
-                    if blacklisted_subfolder_regex.fullmatch(root_folder_item["name"]):
-                        # the folder name matched the blacklist regular expression
-                        continue
-
-                page_number = 1
-                additional_pages = True
-                while additional_pages:
-                    try:
-                        do_github_api_request_return = get_github_api_response(request="repos/" +
-                                                                                       repository_object["full_name"] +
-                                                                                       "/contents/" +
-                                                                                       root_folder_item["name"],
-                                                                               page_number=page_number)
-                    except(json.decoder.JSONDecodeError, urllib.error.HTTPError, TimeoutError):
-                        # I already know the repo is not empty but I don't know what would happen for an empty
-                        # folder since Git doesn't currently support them:
-                        # https://git.wiki.kernel.org/index.php/GitFaq#Can_I_add_empty_directories.3F
-                        # but I'll assume it would be a 404, which will cause get_github_api_response to return None
-                        logger.warning(
-                            "Something went wrong during API request for contents of " + root_folder_item[
-                                "name"] + " folder. Moving on to the next folder...")
-                        break
-                    subfolder_listing = list(do_github_api_request_return["json_data"])
-                    additional_pages = do_github_api_request_return["additional_pages"]
-                    page_number += 1
-
-                    # don't return until all the files in the subfolder is scanned
-                    # (because we want to parse metadata)
-                    # so a variable is needed to store the library folder
-                    library_folder = None
-                    for subfolder_item in subfolder_listing:
-                        if subfolder_item["type"] == "file":
-                            # check for metadata files
-                            if subfolder_item["name"] == "library.properties":
-                                parse_library_dot_properties(metadata_folder=root_folder_item["name"],
-                                                             repository_object=repository_object,
-                                                             row_list=row_list)
-                                library_folder = root_folder_item["name"]
-                            elif subfolder_item["name"] == "library.json":
-                                parse_library_dot_json(metadata_folder=root_folder_item["name"],
-                                                       repository_object=repository_object,
-                                                       row_list=row_list)
-                                library_folder = root_folder_item["name"]
-                            else:
-                                # check for header files
-                                for header_file_extension in header_file_extensions:
-                                    if subfolder_item["name"].endswith(str(header_file_extension)):
-                                        library_folder = root_folder_item["name"]
-                                        break
-                    if library_folder is not None:
-                        # all items in subfolder were checked and a library was detected
-                        return library_folder
     # library folder not found
     return None
+
+
+def find_library(folder_listing, verify):
+    """Determine whether the folder contains a library.
+
+    Keyword arguments:
+    folder_listing -- list of the folder contents
+    verify -- if verification is enabled then it is required that the library be found in the root of the repository
+              and measures will be taken to avoid mistaking a sketch for a library. If verification is not enabled then
+              subfolders of the library will also be checked. (True, False)
+
+    Return values:
+    True -- library found
+    None -- Library not found but verification didn't fail
+    False -- Library not found
+    """
+
+    metadata_file_found = False
+    header_file_found = False
+    sketch_file_found = False
+    examples_folder_found = False
+    only_administrative_files_found = True
+
+    for folder_item in folder_listing:
+        if folder_item["type"] == "file":
+            if folder_item["name"] == "library.properties":
+                metadata_file_found = True
+            elif folder_item["name"] == "library.json":
+                metadata_file_found = True
+            else:
+                for header_file_extension in header_file_extensions:
+                    if folder_item["name"].endswith(str(header_file_extension)):
+                        header_file_found = True
+        # these checks are only required for verification
+        if verify:
+            # check for sketch files in repo root
+            if folder_item["type"] == "file":
+                if (
+                        folder_item["name"].endswith(".ino") or
+                        folder_item["name"].endswith(".pde")
+                ):
+                    sketch_file_found = True
+
+                is_administrative_file = False
+                for administrative_file_regex in administrative_file_whitelist:
+                    administrative_file_regex = re.compile(administrative_file_regex)
+                    if administrative_file_regex.fullmatch(folder_item["name"]):
+                        is_administrative_file = True
+                        break
+                if not is_administrative_file:
+                    only_administrative_files_found = False
+            # check for examples folder in repo root
+            elif folder_item["type"] == "dir":
+                for examples_folder_name in examples_folder_names:
+                    if folder_item["name"] == str(examples_folder_name):
+                        examples_folder_found = True
+                        break
+
+    if verify:
+        # to pass verification, the repo must meet one of the following:
+        # - has metadata file in root
+        # - has header file and no sketch file in root
+        # - has header file and examples (or some variant) folder in root
+        # - has only administrative files in the root and a subfolder meets one of the above
+        if metadata_file_found:
+            # metadata is sufficient whether or not verification is required
+            return True
+        elif header_file_found is True and sketch_file_found is False:
+            # verification passed
+            return True
+        elif header_file_found is True and sketch_file_found is True and examples_folder_found is True:
+            # verification passed
+            return True
+        elif only_administrative_files_found is True:
+            # only administrative files were found in the root so check the subfolders too
+            return None
+        else:
+            # verification failed
+            return False
+    else:
+        if metadata_file_found:
+            return True
+        if header_file_found:
+            # if verification is off then just finding a header file is enough
+            return True
+        else:
+            # library not found
+            return False
 
 
 def parse_library_dot_properties(metadata_folder, repository_object, row_list):
