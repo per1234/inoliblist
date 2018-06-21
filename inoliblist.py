@@ -66,7 +66,24 @@ examples_folder_names = ["examples",
                          ]
 
 # regular expressions fo subfolders to skip when searching the repository for a library
-library_subfolder_blacklist = ["^\..*", "data", "doc", "docs", "examples", "tests"]
+library_subfolder_blacklist = ["^\..*",
+                               "bin",
+                               "data",
+                               "doc",
+                               "docs",
+                               "example",
+                               "examples",
+                               "Examples",
+                               "extras",
+                               "hardware",
+                               "img",
+                               "images",
+                               "lib",
+                               "scripts",
+                               "test",
+                               "tests",
+                               "tools"
+                               ]
 
 output_filename = "inoliblist.csv"
 output_file_delimiter = '\t'
