@@ -13,7 +13,7 @@ An automatically generated list of thousands of [Arduino](http://arduino.cc) lib
   - To ensure it contains an Arduino Library, the repository must have one of the following:
     - Library metadata file ([library.properties](https://github.com/arduino/Arduino/wiki/Arduino-IDE-1.5:-Library-specification#library-metadata) or [library.json](http://docs.platformio.org/en/latest/librarymanager/config.html)).
     - A folder containing a header file (.h, .hh, .hpp) and no sketch file (.ino, .pde).
-    - A folder containing a header file and examples folder if a sketch file is present.
+    - A folder containing a header file and either an examples folder or keywords.txt if a sketch file is present.
   - If only standard administrative files are found in the root folder then one level of subfolders is searched.
 - [GitHub search for `arduino library topics:0 language:cpp language:c language:arduino fork:false`](https://github.com/search?q=arduino+library+topics:0+language:cpp+language:c+language:arduino+fork:false&type=Repositories)
   - The same library verification requirements as the `arduino` topic search.

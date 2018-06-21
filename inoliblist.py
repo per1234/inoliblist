@@ -838,6 +838,7 @@ def find_library(folder_listing, verify):
     """
 
     metadata_file_found = False
+    keywords_dot_txt_found = False
     header_file_found = False
     sketch_file_found = False
     examples_folder_found = False
@@ -849,6 +850,8 @@ def find_library(folder_listing, verify):
                 metadata_file_found = True
             elif folder_item["name"] == "library.json":
                 metadata_file_found = True
+            elif folder_item["name"] == "keywords.txt":
+                keywords_dot_txt_found = True
             else:
                 for header_file_extension in header_file_extensions:
                     if folder_item["name"].endswith(str(header_file_extension)):
@@ -882,18 +885,19 @@ def find_library(folder_listing, verify):
         # to pass verification, the repo must meet one of the following:
         # - has metadata file in root
         # - has header file and no sketch file in root
-        # - has header file and examples (or some variant) folder in root
+        # - has header file and either examples (or some variant) folder or keywords.txt in root
         # - has only administrative files in the root and a subfolder meets one of the above
         if metadata_file_found:
             # metadata is sufficient whether or not verification is required
             return True
-        elif header_file_found is True and sketch_file_found is False:
+        elif header_file_found and not sketch_file_found:
             # verification passed
             return True
-        elif header_file_found is True and sketch_file_found is True and examples_folder_found is True:
+        elif header_file_found and sketch_file_found and (
+                examples_folder_found or keywords_dot_txt_found):
             # verification passed
             return True
-        elif only_administrative_files_found is True:
+        elif only_administrative_files_found:
             # only administrative files were found in the root so check the subfolders too
             return None
         else:
