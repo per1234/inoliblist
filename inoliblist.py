@@ -42,6 +42,9 @@ urlopen_maximum_retries = 5
 # maximum number of results per API request (max allowed by GitHub is 100)
 results_per_page = 100
 
+# when verification is enabled, repositories that match the following regular expressions will be skipped
+repository_name_blacklist = ["arduino"]
+
 # regular expressions for administrative files whitelist to use to determine whether subfolders should be searched
 # during library verification
 administrative_file_whitelist = ["^\..*",  # starts with .
@@ -602,6 +605,20 @@ def search_repositories(search_query, created_argument_list, fork_argument, veri
                 # # so I need to to a whole other API request to get the full repository object to pass to populate_row
                 # repository_object = get_github_api_response(request="repos/" + repository_object["full_name"]
                 #                                             )["json_data"]
+
+                if verify:
+                    repository_name_is_blacklisted = False
+                    for blacklisted_repository_name_regex in repository_name_blacklist:
+                        blacklisted_repository_name_regex = re.compile(blacklisted_repository_name_regex,
+                                                                       flags=re.IGNORECASE
+                                                                       )
+                        if blacklisted_repository_name_regex.fullmatch(repository_object["name"]):
+                            repository_name_is_blacklisted = True
+                            break
+                    if repository_name_is_blacklisted:
+                        # skip this repository
+                        continue
+
                 populate_row(repository_object=repository_object, in_library_manager=False, verify=verify)
 
             if not additional_pages and search_results_count < json_data["total_count"]:

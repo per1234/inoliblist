@@ -314,6 +314,14 @@ class TestInoLibraryList(unittest.TestCase):
         # repository does not meet the verification requirements so it should not be added to the table
         self.assertEqual(len(get_table()), 1)
 
+    def test_search_repositories_verify_blacklist(self):
+        search_repositories(search_query="arduino+in:name+user:Firmata",
+                            created_argument_list=["<2013-01-01", "2013-01-01..2018-06-06"],
+                            fork_argument="false",
+                            verify=True)
+        # repository name is blacklisted so it should not be added to the table
+        self.assertEqual(len(get_table()), 1)
+
     def test_populate_row(self):
         # requirements: library.properties, library.json, contributor count >0
         repository_object = TestInoLibraryList.repository_object_bblanchon_arduinojson["json_data"]
