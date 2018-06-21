@@ -459,6 +459,8 @@ def get_json_from_url(url):
                                 for parameter in link:
                                     if parameter[:5] == "page=":
                                         page_count = parameter.split('=')[1]
+                                        break
+                                break
 
                 # get the number of GitHub API requests from the response header
                 if url.startswith("https://api.github.com") and url_data.info()["X-RateLimit-Remaining"] is not None:
@@ -784,6 +786,7 @@ def find_library_folder(repository_object, row_list, verify):
                         administrative_file_regex = re.compile(administrative_file_regex)
                         if administrative_file_regex.fullmatch(root_directory_item["name"]):
                             is_whitelisted_file = True
+                            break
                     if not is_whitelisted_file:
                         logger.warning("non-administrative file found in root: " + str(root_directory_item["name"]))
                         only_administrative_files_in_root = False
