@@ -56,6 +56,15 @@ administrative_file_whitelist = ["^\..*",  # starts with .
 # library header file extensions recognized by the Arduino IDE
 header_file_extensions = [".h", ".hh", ".hpp"]
 
+# common library examples folder names
+examples_folder_names = ["examples",
+                         "example",
+                         "Examples",
+                         "Example",
+                         "EXAMPLES",
+                         "EXAMPLE"
+                         ]
+
 # regular expressions fo subfolders to skip when searching the repository for a library
 library_subfolder_blacklist = ["^\..*", "data", "doc", "docs", "examples", "tests"]
 
@@ -779,15 +788,11 @@ def find_library_folder(repository_object, row_list, verify):
                         logger.warning("non-administrative file found in root: " + str(root_directory_item["name"]))
                         only_administrative_files_in_root = False
                 # check for examples folder in repo root
-                elif root_directory_item["type"] == "dir" and (
-                        root_directory_item["name"] == "examples" or
-                        root_directory_item["name"] == "example" or
-                        root_directory_item["name"] == "Examples" or
-                        root_directory_item["name"] == "Example" or
-                        root_directory_item["name"] == "EXAMPLES" or
-                        root_directory_item["name"] == "EXAMPLE"
-                ):
-                    examples_folder_in_root = True
+                elif root_directory_item["type"] == "dir":
+                    for examples_folder_name in examples_folder_names:
+                        if root_directory_item["name"] == str(examples_folder_name):
+                            examples_folder_in_root = True
+                            break
 
         if verify:
             # to pass verification, the repo must meet one of the following:
