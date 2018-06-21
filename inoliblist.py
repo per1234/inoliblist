@@ -729,8 +729,26 @@ def find_library_folder(repository_object, row_list, verify):
     if library_folder is not None:
         # metadata file was found in the repo root folder
         return library_folder
-
     # metadata file was not found in the repo root folder
+
+    if not verify:
+        # attempt a blind attempt to open /{repo name}.h to reduce API requests
+        url = normalize_url(url="https://raw.githubusercontent.com/" +
+                                repository_object["full_name"] + "/" +
+                                repository_object["default_branch"] + "/" +
+                                repository_object["name"] + ".h"
+                            )
+        logger.info("Opening URL: " + url)
+        try:
+            with urllib.request.urlopen(url):
+                pass
+            # header file found
+            return "/"
+        except (urllib.error.HTTPError, http.client.RemoteDisconnected) as exception:
+            # don't bother retrying on possibly recoverable exceptions
+            logger.info(str(exception.__class__.__name__) + ": " + str(exception))
+            pass
+
     # get a listing of the root folder contents
     page_number = 1
     additional_pages = True
