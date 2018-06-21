@@ -42,6 +42,11 @@ urlopen_maximum_retries = 5
 # maximum number of results per API request (max allowed by GitHub is 100)
 results_per_page = 100
 
+# (s) delay before retrying search
+search_retry_delay = 60
+# maximum times to retry the search when it returns incomplete or no results
+maximum_search_retries = 10
+
 # when verification is enabled, repositories that match the following regular expressions will be skipped
 repository_name_blacklist = ["arduino"]
 
@@ -582,17 +587,35 @@ def search_repositories(search_query, created_argument_list, fork_argument, veri
             # sort by forks because this is the least frequently changing sort property (can't sort by creation date)
             # changing properties (esp. updated) will cause the search results order to change between pages,
             # leading to duplicates and skips
-            do_github_api_request_return = get_github_api_response(request="search/repositories",
-                                                                   request_parameters="q=" + search_query +
-                                                                                      "+created:" + created_argument +
-                                                                                      "+fork:" + fork_argument +
-                                                                                      "&sort=forks&order=desc",
-                                                                   page_number=page_number)
-            json_data = dict(do_github_api_request_return["json_data"])
 
-            if json_data["incomplete_results"]:
-                logger.warning("Search results are incomplete due to a timeout. " +
-                               "See: https://developer.github.com/v3/search/#timeouts-and-incomplete-results")
+            do_github_api_request_return = ()
+            json_data = ()
+
+            incomplete_results = True
+            search_retry_count = 0
+            while incomplete_results and search_retry_count < maximum_search_retries:
+                search_retry_count += 1
+                do_github_api_request_return = get_github_api_response(request="search/repositories",
+                                                                       request_parameters="q=" + search_query +
+                                                                                          "+created:" +
+                                                                                          created_argument +
+                                                                                          "+fork:" + fork_argument +
+                                                                                          "&sort=forks&order=desc",
+                                                                       page_number=page_number)
+                json_data = dict(do_github_api_request_return["json_data"])
+
+                if json_data["incomplete_results"]:
+                    # I have seen this happen, then on the next try it was fine
+                    logger.warning("Search results are incomplete due to a timeout. Retrying." +
+                                   "See: https://developer.github.com/v3/search/#timeouts-and-incomplete-results")
+                    time.sleep(search_retry_delay)
+                elif json_data["total_count"] == 0:
+                    # I'm don't know if this would occur for any reason that would be resolved by retrying
+                    logger.warning("Search returned 0 results. Retrying.")
+                    # don't delay since this causes a super long delay during the unit test and it's not clear this
+                    # retry even serves any purpose
+                else:
+                    incomplete_results = False
 
             additional_pages = do_github_api_request_return["additional_pages"]
             page_number += 1
