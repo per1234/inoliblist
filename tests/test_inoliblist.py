@@ -284,14 +284,14 @@ class TestInoLibraryList(unittest.TestCase):
 
     def test_search_repositories(self):
         search_repositories(search_query="ethernet+in:name+org:arduino-libraries",
-                            created_argument_list=["<2013-01-01", ">=2013-01-01"],
+                            created_argument_list=[">=2013-01-01"],
                             fork_argument="false",
                             verify=False)
         self.assertEqual(get_table()[1][Column.repository_url], "https://github.com/arduino-libraries/Ethernet")
 
     def test_search_repositories_created_argument_list(self):
         search_repositories(search_query="ethernet+in:name+org:arduino-libraries",
-                            created_argument_list=["<2012-01-01", "2013-01-01..2014-01-01"],
+                            created_argument_list=["<=2012-01-01", "2013-01-01..2014-01-01"],
                             fork_argument="false",
                             verify=False)
         # created_at == 2015-03-27T09:54:12Z so this will return no results if the created_argument_list handling is
@@ -300,7 +300,7 @@ class TestInoLibraryList(unittest.TestCase):
 
     def test_search_repositories_fork_argument(self):
         search_repositories(search_query="watchdoglog+in:name+user:per1234",
-                            created_argument_list=["<2013-01-01", "2013-01-01..2018-06-06"],
+                            created_argument_list=[">2013-01-01"],
                             fork_argument="only",
                             verify=False)
         # search defaults to fork:false so if fork_argument handling is not working this search would give no results
@@ -308,7 +308,7 @@ class TestInoLibraryList(unittest.TestCase):
 
     def test_search_repositories_verify(self):
         search_repositories(search_query="eepromutility+in:name+user:per1234",
-                            created_argument_list=["<2013-01-01", "2013-01-01..2018-06-06"],
+                            created_argument_list=["<2018-06-06"],
                             fork_argument="false",
                             verify=True)
         # repository does not meet the verification requirements so it should not be added to the table
@@ -316,7 +316,7 @@ class TestInoLibraryList(unittest.TestCase):
 
     def test_search_repositories_verify_blacklist(self):
         search_repositories(search_query="arduino+in:name+user:Firmata",
-                            created_argument_list=["<2013-01-01", "2013-01-01..2018-06-06"],
+                            created_argument_list=["2012-01-19"],
                             fork_argument="false",
                             verify=True)
         # repository name is blacklisted so it should not be added to the table
