@@ -981,7 +981,7 @@ def parse_library_dot_properties(metadata_folder, repository_object, row_list):
                         elif field_name == "architectures":
                             row_list[Column.library_manager_architectures] = str(field_value)
             return True
-        except urllib.error.HTTPError as exception:
+        except (urllib.error.HTTPError, http.client.RemoteDisconnected) as exception:
             if not determine_urlopen_retry(exception=exception):
                 return False
 
