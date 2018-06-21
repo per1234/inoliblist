@@ -788,7 +788,6 @@ def find_library_folder(repository_object, row_list, verify):
                             is_administrative_file = True
                             break
                     if not is_administrative_file:
-                        logger.warning("non-administrative file found in root: " + str(root_directory_item["name"]))
                         only_administrative_files_in_root = False
                 # check for examples folder in repo root
                 elif root_directory_item["type"] == "dir":
