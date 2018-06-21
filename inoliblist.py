@@ -781,13 +781,13 @@ def find_library_folder(repository_object, row_list, verify):
                     ):
                         sketch_file_in_root = True
 
-                    is_whitelisted_file = False
+                    is_administrative_file = False
                     for administrative_file_regex in administrative_file_whitelist:
                         administrative_file_regex = re.compile(administrative_file_regex)
                         if administrative_file_regex.fullmatch(root_directory_item["name"]):
-                            is_whitelisted_file = True
+                            is_administrative_file = True
                             break
-                    if not is_whitelisted_file:
+                    if not is_administrative_file:
                         logger.warning("non-administrative file found in root: " + str(root_directory_item["name"]))
                         only_administrative_files_in_root = False
                 # check for examples folder in repo root
@@ -802,16 +802,17 @@ def find_library_folder(repository_object, row_list, verify):
             # - has metadata file in root (already checked above and they are not present)
             # - has header file and no sketch file in root
             # - has header file and examples (or some variant) folder in root
+            # - has only administrative files in the root and a subfolder meets one of the above
 
-            if header_file_in_root is False and only_administrative_files_in_root is True:
-                # only administrative files were found in the root so check the subfolders too
-                pass
-            elif header_file_in_root is True and sketch_file_in_root is False:
+            if header_file_in_root is True and sketch_file_in_root is False:
                 # verification passed
                 return "/"
             elif header_file_in_root is True and sketch_file_in_root is True and examples_folder_in_root is True:
                 # verification passed
                 return "/"
+            elif header_file_in_root is False and only_administrative_files_in_root is True:
+                # only administrative files were found in the root so check the subfolders too
+                pass
             else:
                 # verification failed
                 logger.info(
