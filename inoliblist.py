@@ -37,7 +37,7 @@ urlopen_retry_errors = ["HTTP Error 403: Forbidden",
 # delay before retry after failed urlopen (seconds)
 urlopen_retry_delay = 60
 # maximum times to retry opening the URL before giving up
-urlopen_maximum_retries = 5
+maximum_urlopen_retries = 5
 
 # maximum number of results per API request (max allowed by GitHub is 100)
 results_per_page = 100
@@ -434,7 +434,7 @@ def get_json_from_url(url):
     logger.info("Opening URL: " + url)
 
     retry_count = 0
-    while retry_count <= urlopen_maximum_retries:
+    while retry_count <= maximum_urlopen_retries:
         retry_count += 1
         if url.startswith("https://api.github.com"):
             # the topics data is currently in preview mode so a custom media type must be provided in the Accept header
@@ -998,7 +998,7 @@ def parse_library_dot_properties(metadata_folder, repository_object, row_list):
     """
     # library.properties is not JSON so I can't use my functions
     retry_count = 0
-    while retry_count <= urlopen_maximum_retries:
+    while retry_count <= maximum_urlopen_retries:
         retry_count += 1
         url = normalize_url(url="https://raw.githubusercontent.com/" +
                                 repository_object["full_name"] + "/" +
