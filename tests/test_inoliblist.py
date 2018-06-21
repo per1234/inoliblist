@@ -36,19 +36,6 @@ class TestInoLibraryList(unittest.TestCase):
 
     set_github_token(github_token_input=argument.github_token)
 
-    # https://github.com/FirstBuild/Relay
-    # invalid JSON
-    # folder count:3
-    # archived:n
-    # library.properties:/
-    # library.json:/
-    # header:src
-    # sketch in root:n
-    # examples folder in root:y
-    # license:MIT
-    # contributor count:2
-    repository_object_firstbuild_relay = get_json_from_url(url="https://api.github.com/repos/FirstBuild/Relay")
-
     # https://github.com/triatebr/aprenda-arduino
     # spaces in path:y
     # non-ASCII characters in path:y
@@ -527,18 +514,18 @@ class TestInoLibraryList(unittest.TestCase):
                         )
         self.assertEqual(row_list[Column.platformio_name], "ArduinoJsonRpc")
 
-    def test_parse_library_dot_json_invalid_formatting(self):
-        # initialize the row list
-        row_list = [""] * Column.count
-        # requirements: metadata_folder contains library.json with invalid JSON formatting
-        # NOTE: I have an open PR to fix this: https://github.com/FirstBuild/Relay/pull/3
-        repository_object = TestInoLibraryList.repository_object_firstbuild_relay["json_data"]
-        self.assertTrue(
-            parse_library_dot_json(metadata_folder="/", repository_object=repository_object, row_list=row_list)
-        )
-        # if this assertion fails it indicates the JSON formatting of library.json was fixed and I need to find a
-        # different test case
-        self.assertFalse(row_list[Column.platformio_name] == "FirstBuild - Relay")
+    # # TODO: find suitable repo
+    # def test_parse_library_dot_json_invalid_formatting(self):
+    #     # initialize the row list
+    #     row_list = [""] * Column.count
+    #     # requirements: metadata_folder contains library.json with invalid JSON formatting
+    #     repository_object = TestInoLibraryList.["json_data"]
+    #     self.assertTrue(
+    #         parse_library_dot_json(metadata_folder="/", repository_object=repository_object, row_list=row_list)
+    #     )
+    #     # if this assertion fails it indicates the JSON formatting of library.json was fixed and I need to find a
+    #     # different test case
+    #     self.assertFalse(row_list[Column.platformio_name] == "FirstBuild - Relay")
 
     def test_parse_library_dot_json_fail(self):
         # initialize the row list
