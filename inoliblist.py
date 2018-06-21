@@ -56,13 +56,9 @@ administrative_file_whitelist = ["^\..*",  # starts with .
 # library header file extensions recognized by the Arduino IDE
 header_file_extensions = [".h", ".hh", ".hpp"]
 
-# common library examples folder names
-examples_folder_names = ["examples",
-                         "example",
-                         "Examples",
-                         "Example",
-                         "EXAMPLES",
-                         "EXAMPLE"
+# regular expressions for common library examples folder names
+examples_folder_names = ["^examples$",
+                         "^example$"
                          ]
 
 # regular expressions fo subfolders to skip when searching the repository for a library
@@ -73,7 +69,6 @@ library_subfolder_blacklist = ["^\..*",
                                "docs",
                                "example",
                                "examples",
-                               "Examples",
                                "extras",
                                "hardware",
                                "img",
@@ -810,7 +805,7 @@ def find_library_folder(repository_object, row_list, verify):
             # skip blacklisted subfolder names
             folder_is_blacklisted = False
             for blacklisted_subfolder_regex in library_subfolder_blacklist:
-                blacklisted_subfolder_regex = re.compile(blacklisted_subfolder_regex)
+                blacklisted_subfolder_regex = re.compile(blacklisted_subfolder_regex, flags=re.IGNORECASE)
                 if blacklisted_subfolder_regex.fullmatch(root_folder_item["name"]):
                     # the folder name matched the blacklist regular expression
                     folder_is_blacklisted = True
@@ -904,7 +899,7 @@ def find_library(folder_listing, verify):
 
                 is_administrative_file = False
                 for administrative_file_regex in administrative_file_whitelist:
-                    administrative_file_regex = re.compile(administrative_file_regex)
+                    administrative_file_regex = re.compile(administrative_file_regex, flags=re.IGNORECASE)
                     if administrative_file_regex.fullmatch(folder_item["name"]):
                         is_administrative_file = True
                         break
@@ -912,8 +907,9 @@ def find_library(folder_listing, verify):
                     only_administrative_files_found = False
             # check for examples folder in repo root
             elif folder_item["type"] == "dir":
-                for examples_folder_name in examples_folder_names:
-                    if folder_item["name"] == str(examples_folder_name):
+                for examples_folder_name_regex in examples_folder_names:
+                    examples_folder_name_regex = re.compile(examples_folder_name_regex, flags=re.IGNORECASE)
+                    if examples_folder_name_regex.fullmatch(folder_item["name"]):
                         examples_folder_found = True
                         break
 
