@@ -890,8 +890,7 @@ def parse_library_dot_properties(metadata_folder, repository_object, row_list):
     while retry_count <= urlopen_maximum_retries:
         retry_count += 1
         url = normalize_url(url="https://raw.githubusercontent.com/" +
-                                repository_object["owner"]["login"] + "/" +
-                                repository_object["name"] + "/" +
+                                repository_object["full_name"] + "/" +
                                 repository_object["default_branch"] + "/" +
                                 metadata_folder +
                                 "/library.properties")
@@ -941,8 +940,7 @@ def parse_library_dot_json(metadata_folder, repository_object, row_list):
     row_list -- the list to populate with data from the parsed library.properties
     """
     url = ("https://raw.githubusercontent.com/" +
-           repository_object["owner"]["login"] + "/" +
-           repository_object["name"] + "/" +
+           repository_object["full_name"] + "/" +
            repository_object["default_branch"] + "/" +
            metadata_folder + "/library.json")
     try:
@@ -1087,8 +1085,7 @@ def get_contributor_count(repository_object):
     # the contributor count
     try:
         get_json_from_url_return = get_json_from_url(url="https://api.github.com/repos/" +
-                                                         repository_object["owner"]["login"] + "/" +
-                                                         repository_object["name"] +
+                                                         repository_object["full_name"] +
                                                          "/contributors?per_page=1")
         return str(get_json_from_url_return["page_count"])
     except (json.decoder.JSONDecodeError, TimeoutError):
