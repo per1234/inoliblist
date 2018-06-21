@@ -394,6 +394,7 @@ def check_rate_limiting(api_type):
                     notification_timestamp = time.time()
             # leave the last_api_requests_remaining_value[api_type] set to 0
             # this will cause the actual value to be pulled from the API on the next check_rate_limiting() call
+            check_rate_limiting(api_type=api_type)
         else:
             logger.warning("Mismatch between stored requests remaining value (0) and actual value")
 
