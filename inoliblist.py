@@ -621,13 +621,6 @@ def search_repositories(search_query, created_argument_list, fork_argument, veri
             page_number += 1
             for repository_object in json_data["items"]:
                 search_results_count += 1
-                # disabled since it's not worth an extra API request just for the "Fork of" column
-                # # for some reason the repository data in the search results is missing some items:
-                # # "parent", "source", "network_count", "subscribers_count"
-                # # I need the "parent" object used to get the fork parent
-                # # so I need to to a whole other API request to get the full repository object to pass to populate_row
-                # repository_object = get_github_api_response(request="repos/" + repository_object["full_name"]
-                #                                             )["json_data"]
 
                 if verify:
                     repository_name_is_blacklisted = False
@@ -701,7 +694,15 @@ def populate_row(repository_object, in_library_manager, verify):
     row_list[Column.archived] = str(repository_object["archived"])
     row_list[Column.is_fork] = str(repository_object["fork"])
 
-    # if repository_object["fork"]:
+    # disabled since it's not worth an extra API request just for the "Fork of" column
+    # if repository_object["fork"] and repository_object["parent"] is None:
+    #     # for some reason the repository data in the search results is missing some items:
+    #     # "parent", "source", "network_count", "subscribers_count"
+    #     # I need the "parent" object used to get the fork parent so I need to to a whole other API request to get the
+    #     # full repository object to pass to populate_row
+    #     # this is not necessary for the repos from the Library Manager index since their repository_object already
+    #     # comes from the repos API
+    #     repository_object = get_github_api_response(request="repos/" + repository_object["full_name"])["json_data"]
     #     row_list[Column.fork_of] = str(repository_object["parent"]["full_name"])
 
     row_list[Column.last_push_date] = str(repository_object["pushed_at"])
