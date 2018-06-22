@@ -61,8 +61,10 @@ search_retry_delay = 60
 maximum_search_retries = 10
 
 # when verification is enabled, repositories that match the following regular expressions will be skipped
-repository_name_blacklist = ["arduino",
-                             "sketchbook"
+repository_name_blacklist = ["^arduino$",
+                             "^arduino.*project.$",
+                             ".*sketches.*",
+                             ".*sketchbook.*"
                              ]
 
 # regular expressions for administrative files whitelist to use to determine whether subfolders should be searched
