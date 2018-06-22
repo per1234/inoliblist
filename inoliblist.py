@@ -105,6 +105,7 @@ library_subfolder_blacklist = ["^\..*",
                                ]
 
 verification_failed_list_filename = "verification_failed_list.csv"
+non_library_folders_list_filename = "non_library_folders_list.csv"
 
 output_filename = "inoliblist.csv"
 output_file_delimiter = '\t'
@@ -223,9 +224,10 @@ def main():
     set_github_token(github_token_input=argument.github_token)
     set_verbosity(enable_verbosity_input=argument.enable_verbosity)
     initialize_table()
-    # delete previous copy of the verification failed list
+    # delete previous copy of the output files
     try:
         os.remove(verification_failed_list_filename)
+        os.remove(non_library_folders_list_filename)
     except FileNotFoundError:
         # the file is not present
         pass
@@ -927,6 +929,14 @@ def find_library_folder(repository_object, row_list, verify):
                                        repository_object=repository_object,
                                        row_list=row_list)
                 return root_folder_item["name"]
+            else:
+                # add the folder name to the list of folders found to not contain libraries
+                with open(non_library_folders_list_filename,
+                          mode="a",
+                          encoding="utf-8",
+                          newline=''
+                          ) as non_library_folders_list:
+                    non_library_folders_list.write(str(root_folder_item["name"]) + '\n')
 
     # library folder not found
     return None
