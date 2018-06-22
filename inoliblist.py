@@ -104,9 +104,9 @@ library_subfolder_blacklist = ["^\..*",
                                "tools"
                                ]
 
+output_folder_name = "output"
 verification_failed_list_filename = "verification_failed_list.csv"
 non_library_folders_list_filename = "non_library_folders_list.csv"
-
 output_filename = "inoliblist.csv"
 output_file_delimiter = '\t'
 output_file_quotechar = None
@@ -224,13 +224,7 @@ def main():
     set_github_token(github_token_input=argument.github_token)
     set_verbosity(enable_verbosity_input=argument.enable_verbosity)
     initialize_table()
-    # delete previous copy of the output files
-    try:
-        os.remove(verification_failed_list_filename)
-        os.remove(non_library_folders_list_filename)
-    except FileNotFoundError:
-        # the file is not present
-        pass
+    initialize_output_files()
     populate_table()
     create_output_file()
 
@@ -371,6 +365,22 @@ def initialize_table():
 def get_table():
     """Return the table global variable. Used by the unit tests to check the value."""
     return table
+
+
+def initialize_output_files():
+    """Create output folder and remove previous verification failed and non-library folder output files."""
+    if not os.path.exists(output_folder_name):
+        os.makedirs(output_folder_name)
+    # delete previous copy of the output files
+    try:
+        os.remove(output_folder_name + "/" + verification_failed_list_filename)
+    except FileNotFoundError:
+        # the file is not present
+        pass
+    try:
+        os.remove(output_folder_name + "/" + non_library_folders_list_filename)
+    except FileNotFoundError:
+        pass
 
 
 def get_github_api_response(request, request_parameters="", page_number=1):
@@ -710,7 +720,7 @@ def populate_row(repository_object, in_library_manager, verify):
             # verification is required and a library was not found so skip the repo
             logger.info("Skipping (library verification failed)")
             # add the repo's URL to the failed verification list
-            with open(verification_failed_list_filename,
+            with open(output_folder_name + "/" + verification_failed_list_filename,
                       mode="a",
                       encoding="utf-8",
                       newline=''
@@ -931,7 +941,7 @@ def find_library_folder(repository_object, row_list, verify):
                 return root_folder_item["name"]
             else:
                 # add the folder name to the list of folders found to not contain libraries
-                with open(non_library_folders_list_filename,
+                with open(output_folder_name + "/" + non_library_folders_list_filename,
                           mode="a",
                           encoding="utf-8",
                           newline=''
@@ -1268,7 +1278,7 @@ def create_output_file():
 
     # create the CSV file
     # if the file already exists, this will clear it of previous data
-    with open(file=output_filename, mode="w", encoding="utf-8", newline='') as csv_file:
+    with open(file=output_folder_name + "/" + output_filename, mode="w", encoding="utf-8", newline='') as csv_file:
         # create the writer object
         csv_writer = csv.writer(csv_file, delimiter=output_file_delimiter, quotechar=output_file_quotechar)
         # write the table to the CSV file

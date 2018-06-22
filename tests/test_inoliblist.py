@@ -217,6 +217,7 @@ class TestInoLibraryList(unittest.TestCase):
     def setUp(self):
         set_github_token(github_token_input=argument.github_token)
         initialize_table()
+        initialize_output_files()
 
     def test_set_github_token(self):
         set_github_token(github_token_input=None)
@@ -422,11 +423,10 @@ class TestInoLibraryList(unittest.TestCase):
     def test_populate_row_verify_fail(self):
         # requirements: fail verification
         repository_object = TestInoLibraryList.repository_object_arduino_forum_issues["json_data"]
-        os.remove(verification_failed_list_filename)
         populate_row(repository_object=repository_object, in_library_manager=True, verify=True)
         self.assertEqual(len(get_table()), 1)
         # the repo should have been added to the failed verification list
-        with open(verification_failed_list_filename,
+        with open(file=output_folder_name + "/" + verification_failed_list_filename,
                   mode="r",
                   encoding="utf-8",
                   newline=''
@@ -614,7 +614,7 @@ class TestInoLibraryList(unittest.TestCase):
                      in_library_manager=True,
                      verify=False)
         create_output_file()
-        with open(file=output_filename, mode='r', encoding="utf-8") as csv_file:
+        with open(file=output_folder_name + "/" + output_filename, mode='r', encoding="utf-8") as csv_file:
             csv_data = csv.reader(csv_file, delimiter=output_file_delimiter, quotechar=output_file_quotechar)
             # convert to list so specific rows can be accessed
             csv_data = list(csv_data)
@@ -623,7 +623,7 @@ class TestInoLibraryList(unittest.TestCase):
     def test_create_output_file_empty(self):
         # remove existing file
         try:
-            os.remove(output_filename)
+            os.remove(output_folder_name + "/" + output_filename)
         except FileNotFoundError:
             pass
 
@@ -631,7 +631,7 @@ class TestInoLibraryList(unittest.TestCase):
 
         # create_output_file() should not write an output file with an empty list
         with self.assertRaises(FileNotFoundError):
-            with open(file=output_filename, mode='r', encoding="utf-8"):
+            with open(file=output_folder_name + "/" + output_filename, mode='r', encoding="utf-8"):
                 pass
 
 
