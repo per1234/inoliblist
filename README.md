@@ -1,4 +1,4 @@
-An automatically generated list of thousands of [Arduino](http://arduino.cc) library GitHub repositories with relevant metadata. The list is updated weekly.
+An list of thousands of [Arduino](http://arduino.cc) library GitHub repositories with relevant metadata.
 
 
 ### Available list formats
