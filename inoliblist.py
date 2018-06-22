@@ -10,6 +10,8 @@ import http.client
 import json
 # for debug output
 import logging
+# for deleting failed verification list file
+import os
 # for parsing page count from response header
 import re
 # for handling rate limiting timeouts
@@ -101,6 +103,8 @@ library_subfolder_blacklist = ["^\..*",
                                "tests",
                                "tools"
                                ]
+
+verification_failed_list_filename = "verification_failed_list.csv"
 
 output_filename = "inoliblist.csv"
 output_file_delimiter = '\t'
@@ -219,6 +223,12 @@ def main():
     set_github_token(github_token_input=argument.github_token)
     set_verbosity(enable_verbosity_input=argument.enable_verbosity)
     initialize_table()
+    # delete previous copy of the verification failed list
+    try:
+        os.remove(verification_failed_list_filename)
+    except FileNotFoundError:
+        # the file is not present
+        pass
     populate_table()
     create_output_file()
 
@@ -697,6 +707,13 @@ def populate_row(repository_object, in_library_manager, verify):
         if verify:
             # verification is required and a library was not found so skip the repo
             logger.info("Skipping (library verification failed)")
+            # add the repo's URL to the failed verification list
+            with open(verification_failed_list_filename,
+                      mode="a",
+                      encoding="utf-8",
+                      newline=''
+                      ) as failed_verification_list:
+                failed_verification_list.write(str(repository_object["html_url"]) + '\n')
             return
         library_folder = ""
 

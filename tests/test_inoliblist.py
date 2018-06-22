@@ -1,7 +1,5 @@
 # must specify UTF-8 encoding due to the non-ASCII characters in the ArduinoJSON description
 # encoding: utf-8
-# for opening the output file
-import os
 # for making custom command line arguments work in conjunction with the unittest module
 import sys
 # for unit testing
@@ -424,8 +422,16 @@ class TestInoLibraryList(unittest.TestCase):
     def test_populate_row_verify_fail(self):
         # requirements: fail verification
         repository_object = TestInoLibraryList.repository_object_arduino_forum_issues["json_data"]
+        os.remove(verification_failed_list_filename)
         populate_row(repository_object=repository_object, in_library_manager=True, verify=True)
         self.assertEqual(len(get_table()), 1)
+        # the repo should have been added to the failed verification list
+        with open(verification_failed_list_filename,
+                  mode="r",
+                  encoding="utf-8",
+                  newline=''
+                  ) as failed_verification_list:
+            self.assertEqual(failed_verification_list.read(), str(repository_object["html_url"]) + '\n')
 
     def test_find_library_folder_library_dot_properties_in_root(self):
         # requirements: library.properties in the root, no library.json in the root, no header in root
