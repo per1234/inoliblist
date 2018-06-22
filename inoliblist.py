@@ -69,6 +69,7 @@ administrative_file_whitelist = ["^\..*",  # starts with .
                                  "^[^\.]*$",  # doesn't contain .
                                  "^.*\.adoc$",
                                  "^.*\.md$",
+                                 "^.*\.rst$",
                                  "^.*\.txt$",
                                  "^platformio.ini$"
                                  ]
