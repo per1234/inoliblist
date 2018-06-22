@@ -67,9 +67,8 @@ repository_name_blacklist = ["arduino",
 # during library verification
 administrative_file_whitelist = ["^\..*",  # starts with .
                                  "^[^\.]*$",  # doesn't contain .
-                                 "^.*\.md$",
-                                 "^.*\.txt$",
                                  "^.*\.adoc$",
+                                 "^.*\.md$",
                                  "^.*\.txt$",
                                  "^platformio.ini$"
                                  ]
