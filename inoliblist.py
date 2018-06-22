@@ -606,12 +606,12 @@ def search_repositories(search_query, created_argument_list, fork_argument, veri
 
                 if json_data["incomplete_results"]:
                     # I have seen this happen, then on the next try it was fine
-                    logger.warning("Search results are incomplete due to a timeout. Retrying. " +
-                                   "See: https://developer.github.com/v3/search/#timeouts-and-incomplete-results")
+                    print("Search results are incomplete due to a timeout. Retrying. " +
+                          "See: https://developer.github.com/v3/search/#timeouts-and-incomplete-results")
                     time.sleep(search_retry_delay)
                 elif json_data["total_count"] == 0:
                     # I'm don't know if this would occur for any reason that would be resolved by retrying
-                    logger.warning("Search returned 0 results. Retrying.")
+                    print("Search returned 0 results. Retrying.")
                     # don't delay since this causes a super long delay during the unit test and it's not clear this
                     # retry even serves any purpose
                 else:
