@@ -28,12 +28,20 @@ rate_limit_reset_wait_notification_interval = 300
 # (s) delay after rate limit reset time to make sure it has actually reset before the next API request
 rate_limit_reset_wait_additional_delay = 180
 
-# retry urlopen after these HTTP error statuses
-# 403 error ("Forbidden") happens when API request allowance is exceeded
-urlopen_retry_errors = ["HTTP Error 403: Forbidden",
-                        "HTTP Error 502: Bad Gateway",
-                        "HTTP Error 503: Service Unavailable",
-                        "Remote end closed connection without response"]
+# call check_rate_limiting() after an exception that stars with this string
+# urllib.error.HTTPError: HTTP Error 503: Service Unavailable
+check_rate_limiting_after_exception = "HTTPError: HTTP Error 503"
+# retry urlopen after exceptions that start with the following strings
+# urllib.error.HTTPError: HTTP Error 403: Forbidden
+urlopen_retry_exceptions = ["HTTPError: HTTP Error 403",
+                            # urllib.error.HTTPError: HTTP Error 502: Bad Gateway
+                            "HTTPError: HTTP Error 502",
+                            check_rate_limiting_after_exception,
+                            # http.client.RemoteDisconnected: Remote end closed connection without response
+                            # https://circleci.com/gh/per1234/inoliblist/4
+                            "RemoteDisconnected"
+                            ]
+
 # delay before retry after failed urlopen (seconds)
 urlopen_retry_delay = 60
 # maximum times to retry opening the URL before giving up
@@ -493,7 +501,7 @@ def get_json_from_url(url):
                         last_api_requests_remaining_value["core"] = int(url_data.info()["X-RateLimit-Remaining"])
 
                 return {"json_data": json_data, "additional_pages": additional_pages, "page_count": page_count}
-        except (urllib.error.HTTPError, http.client.RemoteDisconnected) as exception:
+        except Exception as exception:
             if not determine_urlopen_retry(exception=exception):
                 raise exception
 
@@ -508,24 +516,25 @@ def determine_urlopen_retry(exception):
     Keyword arguments:
     exception -- the exception
     """
-    logger.info(str(exception.__class__.__name__) + ": " + str(exception))
-    for error_code in urlopen_retry_errors:
-        if str(exception).startswith(error_code):
+    exception_string = str(exception.__class__.__name__) + ": " + str(exception)
+    logger.info(exception_string)
+    for urlopen_retry_exception in urlopen_retry_exceptions:
+        if str(exception_string).startswith(urlopen_retry_exception):
             # these errors may only be temporary, retry
-            print("Temporarily unable to open URL (" + error_code + "), retrying")
-            if error_code == "HTTP Error 403: Forbidden":
+            print("Temporarily unable to open URL (" + str(exception) + "), retrying")
+            if exception_string.startswith(check_rate_limiting_after_exception):
                 # ideally this would only be done if the URL opened was api.github.com and use the correct API type but
                 # it should do no real harm as is
                 check_rate_limiting(api_type="core")
                 check_rate_limiting(api_type="search")
             time.sleep(urlopen_retry_delay)
             return True
-    else:
-        # other errors are probably permanent so give up
-        if str(exception).startswith("HTTP Error 401: Unauthorized"):
-            print(exception)
-            print("HTTP Error 401 may be caused by providing an incorrect GitHub personal access token.")
-        return False
+
+    # other errors are probably permanent so give up
+    if str(exception_string).startswith("urllib.error.HTTPError: HTTP Error 401"):
+        print(exception)
+        print("HTTP Error 401 may be caused by providing an incorrect GitHub personal access token.")
+    return False
 
 
 def normalize_url(url):
@@ -1036,7 +1045,7 @@ def parse_library_dot_properties(metadata_folder, repository_object, row_list):
                         elif field_name == "architectures":
                             row_list[Column.library_manager_architectures] = str(field_value)
             return True
-        except (urllib.error.HTTPError, http.client.RemoteDisconnected) as exception:
+        except Exception as exception:
             if not determine_urlopen_retry(exception=exception):
                 return False
 
