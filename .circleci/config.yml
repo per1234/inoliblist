@@ -3,7 +3,7 @@
 # Circle CI version
 version: 2
 jobs:
-  test:
+  check:
     docker:
       - image: circleci/python:3.6.5
     working_directory: ~/repo
@@ -40,6 +40,14 @@ jobs:
             . venv/bin/activate
             pip install pycodestyle
             find . -path './.venv' -prune -name \*.py -exec pycodestyle {} +
+
+
+  test:
+    docker:
+      - image: circleci/python:3.6.5
+    working_directory: ~/repo
+    steps:
+      - checkout
 
       - run:
           name: Run unit tests
@@ -95,6 +103,7 @@ workflows:
 
   on-push:
     jobs:
+      - check
       - test:
           filters:
             branches:
@@ -102,6 +111,7 @@ workflows:
       - generate-list-manual-trigger:
           type: approval
           requires:
+            - check
             - test
       - generate-list:
           requires:
