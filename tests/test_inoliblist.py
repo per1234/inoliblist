@@ -367,7 +367,6 @@ class TestInoLibraryList(unittest.TestCase):
         self.assertNotEqual(get_table()[1][Column.star_count], "")
         self.assertNotEqual(get_table()[1][Column.contributor_count], "")
         self.assertNotEqual(get_table()[1][Column.contributor_count], "0")
-        self.assertNotEqual(get_table()[1][Column.contributor_count], "")
         self.assertEqual(get_table()[1][Column.repository_license], "MIT")
         self.assertEqual(get_table()[1][Column.repository_language], "C++")
         self.assertNotEqual(get_table()[1][Column.repository_description], "")
