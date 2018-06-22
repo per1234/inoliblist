@@ -127,7 +127,7 @@ class ColumnEnum(enum.IntEnum):
     library_path = enum.auto()
     archived = enum.auto()
     is_fork = enum.auto()
-    # fork_of = enum.auto()
+    fork_of = enum.auto()
     last_push_date = enum.auto()
     fork_count = enum.auto()
     star_count = enum.auto()
@@ -171,7 +171,7 @@ class Column:
     library_path = int(ColumnEnum.library_path)
     archived = int(ColumnEnum.archived)
     is_fork = int(ColumnEnum.is_fork)
-    # fork_of = int(ColumnEnum.fork_of)
+    fork_of = int(ColumnEnum.fork_of)
     last_push_date = int(ColumnEnum.last_push_date)
     fork_count = int(ColumnEnum.fork_count)
     star_count = int(ColumnEnum.star_count)
@@ -322,7 +322,7 @@ def initialize_table():
     table[0][Column.library_path] = "Library Path \x1b \x1b"
     table[0][Column.archived] = "Archived \x1b \x1b"
     table[0][Column.is_fork] = "Fork \x1b \x1b"
-    # table[0][Column.fork_of] = "Fork Of \x1b \x1b"
+    table[0][Column.fork_of] = "Fork Of \x1b \x1b"
     table[0][Column.last_push_date] = "Last Push \x1b \x1b"
     table[0][Column.fork_count] = "#Forks \x1b \x1b"
     table[0][Column.star_count] = "#Stars \x1b \x1b"
@@ -709,16 +709,22 @@ def populate_row(repository_object, in_library_manager, verify):
     row_list[Column.archived] = str(repository_object["archived"])
     row_list[Column.is_fork] = str(repository_object["fork"])
 
-    # disabled since it's not worth an extra API request just for the "Fork of" column
-    # if repository_object["fork"] and repository_object["parent"] is None:
-    #     # for some reason the repository data in the search results is missing some items:
-    #     # "parent", "source", "network_count", "subscribers_count"
-    #     # I need the "parent" object used to get the fork parent so I need to to a whole other API request to get the
-    #     # full repository object to pass to populate_row
-    #     # this is not necessary for the repos from the Library Manager index since their repository_object already
-    #     # comes from the repos API
-    #     repository_object = get_github_api_response(request="repos/" + repository_object["full_name"])["json_data"]
-    #     row_list[Column.fork_of] = str(repository_object["parent"]["full_name"])
+    if repository_object["fork"]:
+        try:
+            row_list[Column.fork_of] = str(repository_object["parent"]["full_name"])
+        except KeyError:
+            # the repository data in the search results is missing some items:
+            # "parent", "source", "network_count", "subscribers_count"
+            # I need the "parent" object to get the fork parent so I need to to a whole other API request to get the
+            # full repository object to pass to populate_row
+            # this is not necessary for the repos from the Library Manager index since their repository_object already
+            # comes from the repos API
+            do_github_api_request_return = get_github_api_response(request="repos/" +
+                                                                           repository_object["full_name"]
+                                                                   )
+            # replace search API version of repository_object with the full repos API version
+            repository_object = dict(do_github_api_request_return["json_data"])
+            row_list[Column.fork_of] = str(repository_object["parent"]["full_name"])
 
     row_list[Column.last_push_date] = str(repository_object["pushed_at"])
     row_list[Column.fork_count] = str(repository_object["forks_count"])

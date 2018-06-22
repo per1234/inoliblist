@@ -41,6 +41,7 @@ class TestInoLibraryList(unittest.TestCase):
     # non-ASCII characters in path:y
     # folder count:40
     # archived:n
+    # fork:n
     # library.properties:n
     # library.json:n
     # header:n
@@ -54,11 +55,13 @@ class TestInoLibraryList(unittest.TestCase):
 
     # https://github.com/Alexed98/first
     # empty repository
+    # fork:n
     repository_object_alexed98_first = get_json_from_url(url="https://api.github.com/repos/Alexed98/first")
 
     # https://github.com/arduino/forum-issues
     # folder count:0
     # archived:n
+    # fork:n
     # library.properties:n
     # library.json:n
     # header:n
@@ -71,6 +74,7 @@ class TestInoLibraryList(unittest.TestCase):
     # https://github.com/sparkfun/phant-arduino
     # folder count:2
     # archived:y
+    # fork:n
     # library.properties:/
     # library.json:n
     # header:src
@@ -89,6 +93,7 @@ class TestInoLibraryList(unittest.TestCase):
     # https://github.com/VEBERArnaud/ShiftRegister__ArduinoLibrary
     # folder count:0
     # archived:y
+    # fork:n
     # library.properties:n
     # library.json:n
     # header:/
@@ -104,6 +109,7 @@ class TestInoLibraryList(unittest.TestCase):
     # https://github.com/spaceshipyard/ArduinoJsonRpc
     # folder count:3
     # archived:y
+    # fork:n
     # library.properties:n
     # library.json:/
     # header:src
@@ -118,6 +124,7 @@ class TestInoLibraryList(unittest.TestCase):
     # https://github.com/MHeironimus/ArduinoJoystickLibrary
     # folder count:1
     # archived:n
+    # fork:n
     # library.properties:Joystick
     # library.json:n
     # header:Joystick/src
@@ -133,6 +140,7 @@ class TestInoLibraryList(unittest.TestCase):
     # https://github.com/menan/SparkJson
     # folder count:1
     # archived:n
+    # fork:n
     # library.properties:n
     # library.json:n
     # header:firmware
@@ -147,6 +155,7 @@ class TestInoLibraryList(unittest.TestCase):
     # https://github.com/chen-yumin/skittle-color-sorter
     # folder count:2
     # archived:n
+    # fork:n
     # library.properties:n
     # library.json:n
     # header:/
@@ -161,6 +170,7 @@ class TestInoLibraryList(unittest.TestCase):
     # https://github.com/bblanchon/ArduinoJson
     # folder count:6
     # archived:n
+    # fork:n
     # library.properties:/
     # library.json:/
     # header:src
@@ -176,6 +186,7 @@ class TestInoLibraryList(unittest.TestCase):
     # folder count:1
     # archived:n
     # active:n
+    # fork:n
     # library.properties:n
     # library.json:m
     # header:Talkie
@@ -186,6 +197,23 @@ class TestInoLibraryList(unittest.TestCase):
     # contributor count:2
     repository_object_going_digital_talkie = get_json_from_url(
         url="https://api.github.com/repos/going-digital/Talkie"
+    )
+
+    # https://github.com/per1234/watchdoglog
+    # folder count:1
+    # archived:n
+    # active:y
+    # fork:y
+    # library.properties:y
+    # library.json:m
+    # header:/
+    # sketch in root:n
+    # examples folder in root:y
+    # only administrative files in root:n
+    # license:MIT
+    # contributor count:3
+    repository_object_per1234_watchdoglog = get_json_from_url(
+        url="https://api.github.com/repos/per1234/watchdoglog"
     )
 
     def setUp(self):
@@ -333,7 +361,7 @@ class TestInoLibraryList(unittest.TestCase):
         self.assertEqual(get_table()[1][Column.library_path], "/")
         self.assertEqual(get_table()[1][Column.archived], "False")
         self.assertEqual(get_table()[1][Column.is_fork], "False")
-        # self.assertEqual(get_table()[1][Column.fork_of], "")
+        self.assertEqual(get_table()[1][Column.fork_of], "")
         self.assertNotEqual(get_table()[1][Column.last_push_date], "")
         self.assertNotEqual(get_table()[1][Column.fork_count], "")
         self.assertNotEqual(get_table()[1][Column.star_count], "")
@@ -374,6 +402,12 @@ class TestInoLibraryList(unittest.TestCase):
                          "https://arduinojson.org/?utm_source=meta&utm_medium=library.json")
         self.assertEqual(get_table()[1][Column.platformio_frameworks], "arduino")
         self.assertEqual(get_table()[1][Column.platformio_platforms], "*")
+
+    def test_populate_row_fork_of(self):
+        # requirements: fork
+        repository_object = TestInoLibraryList.repository_object_per1234_watchdoglog["json_data"]
+        populate_row(repository_object=repository_object, in_library_manager=True, verify=False)
+        self.assertEqual(get_table()[1][Column.fork_of], "Megunolink/ArduinoCrashMonitor")
 
     def test_populate_row_no_verify(self):
         # requirements: fail verification, no subfolders

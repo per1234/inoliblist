@@ -27,6 +27,7 @@ An list of thousands of [Arduino](http://arduino.cc) library GitHub repositories
 - **Library Path**: The folder of the repository where a library was detected. The script only scans the repository root, and one subfolder down. If a library is not found at those locations then the field will be left empty.
 - **Archived**: Whether the repository is [archived](https://help.github.com/articles/about-archiving-repositories/). Archived repositories are read-only.
 - **Fork**: Whether the repository is a fork.
+- **Fork Of**: If the repository is a fork, the name of the parent.
 - **Last Push**: Timestamp of the last push to the repository.
 - **#Forks**: Number of forks of the repository. Note that this is forks of the repository specifically, as opposed to the "Fork" number shown on a repository's GitHub homepage, which is the total number of forks in the repository's network.
 - **#Stars**: Number of people who have "starred" the repository.
