@@ -39,7 +39,10 @@ urlopen_retry_exceptions = ["HTTPError: HTTP Error 403",
                             check_rate_limiting_after_exception,
                             # http.client.RemoteDisconnected: Remote end closed connection without response
                             # https://circleci.com/gh/per1234/inoliblist/4
-                            "RemoteDisconnected"
+                            "RemoteDisconnected",
+                            # ConnectionResetError: [Errno 104] Connection reset by peer
+                            # https://circleci.com/gh/per1234/inoliblist/25
+                            "ConnectionResetError"
                             ]
 
 # delay before retry after failed urlopen (seconds)
