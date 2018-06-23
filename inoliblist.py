@@ -173,6 +173,9 @@ library_subfolder_blacklist = ["^\..*",  # starts with .
                                "^www"
                                ]
 
+unrecognized_license_identifier = "unrecognized"
+no_license_identifier = "none"
+
 output_folder_name = "output"
 verification_failed_list_filename = "verification_failed_list.csv"
 non_library_folders_list_filename = "non_library_folders_list.csv"
@@ -1317,11 +1320,11 @@ def get_repository_license(repository_object):
     """
     if repository_object["license"] is None:
         # no license file in the repo root
-        return "none"
+        return no_license_identifier
     elif repository_object["license"]["spdx_id"] is None:
         # there is a license file but the Licensee Ruby gem used by GitHub was unable to determine a standard license
         # type from it
-        return "unrecognized"
+        return unrecognized_license_identifier
     else:
         return repository_object["license"]["spdx_id"]
 
