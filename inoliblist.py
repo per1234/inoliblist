@@ -728,19 +728,6 @@ def search_repositories(search_query, created_argument_list, fork_argument, veri
             for repository_object in json_data["items"]:
                 search_results_count += 1
 
-                if verify:
-                    repository_name_is_blacklisted = False
-                    for blacklisted_repository_name_regex in repository_name_blacklist:
-                        blacklisted_repository_name_regex = re.compile(blacklisted_repository_name_regex,
-                                                                       flags=re.IGNORECASE
-                                                                       )
-                        if blacklisted_repository_name_regex.fullmatch(repository_object["name"]):
-                            repository_name_is_blacklisted = True
-                            break
-                    if repository_name_is_blacklisted:
-                        # skip this repository
-                        continue
-
                 populate_row(repository_object=repository_object, in_library_manager=False, verify=verify)
 
             if not additional_pages and search_results_count < json_data["total_count"]:
@@ -770,6 +757,21 @@ def populate_row(repository_object, in_library_manager, verify):
     global table
 
     logger.info("Attempting to populate row for: " + repository_object["html_url"])
+
+    # check if the repo name is blacklisted
+    if verify:
+        repository_name_is_blacklisted = False
+        for blacklisted_repository_name_regex in repository_name_blacklist:
+            blacklisted_repository_name_regex = re.compile(blacklisted_repository_name_regex,
+                                                           flags=re.IGNORECASE
+                                                           )
+            if blacklisted_repository_name_regex.fullmatch(repository_object["name"]):
+                repository_name_is_blacklisted = True
+                break
+        if repository_name_is_blacklisted:
+            # skip this repository
+            logger.info("Skipping blacklisted repository name: " + repository_object["html_url"])
+            return
 
     # check if it's already on the list
     for readRow in table:
