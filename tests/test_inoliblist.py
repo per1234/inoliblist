@@ -238,7 +238,7 @@ class TestInoLibraryList(unittest.TestCase):
 
     def test_process_library_manager_index(self):
         # open an abbreviated local copy of the Library Manager index
-        with open('data/library_index.json', encoding="utf-8") as json_file:
+        with open('data/library_index.json', encoding=file_encoding) as json_file:
             json_data = json.load(json_file)
         process_library_manager_index(json_data=json_data)
         self.assertEqual(get_table()[1][Column.repository_name], "Esplora")
@@ -428,8 +428,8 @@ class TestInoLibraryList(unittest.TestCase):
         # the repo should have been added to the failed verification list
         with open(file=output_folder_name + "/" + verification_failed_list_filename,
                   mode="r",
-                  encoding="utf-8",
-                  newline=''
+                  encoding=file_encoding,
+                  newline=file_newline
                   ) as failed_verification_list:
             self.assertEqual(failed_verification_list.read(), str(repository_object["html_url"]) + '\n')
 
@@ -614,7 +614,11 @@ class TestInoLibraryList(unittest.TestCase):
                      in_library_manager=True,
                      verify=False)
         create_output_file()
-        with open(file=output_folder_name + "/" + output_filename, mode='r', encoding="utf-8") as csv_file:
+        with open(file=output_folder_name + "/" + output_filename,
+                  mode='r',
+                  encoding=file_encoding,
+                  newline=file_newline
+                  ) as csv_file:
             csv_data = csv.reader(csv_file, delimiter=output_file_delimiter, quotechar=output_file_quotechar)
             # convert to list so specific rows can be accessed
             csv_data = list(csv_data)
@@ -631,7 +635,11 @@ class TestInoLibraryList(unittest.TestCase):
 
         # create_output_file() should not write an output file with an empty list
         with self.assertRaises(FileNotFoundError):
-            with open(file=output_folder_name + "/" + output_filename, mode='r', encoding="utf-8"):
+            with open(file=output_folder_name + "/" + output_filename,
+                      mode='r',
+                      encoding=file_encoding,
+                      newline=file_newline
+                      ):
                 pass
 
 

@@ -179,6 +179,8 @@ non_library_folders_list_filename = "non_library_folders_list.csv"
 output_filename = "inoliblist.csv"
 output_file_delimiter = '\t'
 output_file_quotechar = None
+file_encoding = "utf-8"
+file_newline = ''
 
 # DEBUG: automatically generated output and all higher log level output
 # INFO: manually specified output and all higher log level output
@@ -559,7 +561,7 @@ def get_json_from_url(url):
         try:
             with urllib.request.urlopen(request) as url_data:
                 try:
-                    json_data = json.loads(url_data.read().decode("utf-8", "ignore"))
+                    json_data = json.loads(url_data.read().decode(file_encoding, "ignore"))
                 except json.decoder.JSONDecodeError as exception:
                     # output some information on the exception
                     logger.warning(str(exception.__class__.__name__) + ": " + str(exception))
@@ -805,7 +807,7 @@ def populate_row(repository_object, in_library_manager, verify):
             # add the repo's URL to the failed verification list
             with open(output_folder_name + "/" + verification_failed_list_filename,
                       mode="a",
-                      encoding="utf-8",
+                      encoding=file_encoding,
                       newline=''
                       ) as failed_verification_list:
                 failed_verification_list.write(str(repository_object["html_url"]) + '\n')
@@ -1026,7 +1028,7 @@ def find_library_folder(repository_object, row_list, verify):
                 # add the folder name to the list of folders found to not contain libraries
                 with open(output_folder_name + "/" + non_library_folders_list_filename,
                           mode="a",
-                          encoding="utf-8",
+                          encoding=file_encoding,
                           newline=''
                           ) as non_library_folders_list:
                     non_library_folders_list.write(str(root_folder_item["name"]) + '\n')
@@ -1151,7 +1153,7 @@ def parse_library_dot_properties(metadata_folder, repository_object, row_list):
         try:
             with urllib.request.urlopen(url) as url_data:
                 # step through each line of library.properties
-                for line in url_data.read().decode("utf-8", "ignore").splitlines():
+                for line in url_data.read().decode(file_encoding, "ignore").splitlines():
                     # split the line by the first =
                     field = line.split('=', 1)
                     if len(field) > 1:
@@ -1364,7 +1366,11 @@ def create_output_file():
 
     # create the CSV file
     # if the file already exists, this will clear it of previous data
-    with open(file=output_folder_name + "/" + output_filename, mode="w", encoding="utf-8", newline='') as csv_file:
+    with open(file=output_folder_name + "/" + output_filename,
+              mode="w",
+              encoding=file_encoding,
+              newline=file_newline
+              ) as csv_file:
         # create the writer object
         csv_writer = csv.writer(csv_file, delimiter=output_file_delimiter, quotechar=output_file_quotechar)
         # write the table to the CSV file
