@@ -29,18 +29,18 @@ An list of thousands of [Arduino](http://arduino.cc) library GitHub repositories
 - **Fork**: Whether the repository is a fork.
 - **Fork Of**: If the repository is a fork, the name of the parent.
 - **Last Push**: Timestamp of the last push to the repository.
-- **#Forks**: Number of forks of the repository. Note that this is forks of the repository specifically, as opposed to the "Fork" number shown on a repository's GitHub homepage, which is the total number of forks in the repository's network.
+- **#Forks**: Number of forks of the repository. Note: This is forks of the repository specifically, as opposed to the "Fork" number shown on a repository's GitHub homepage, which is the total number of forks in the repository's network.
 - **#Stars**: Number of people who have "starred" the repository.
 - **#Contributors**: Number of people who have committed to the repository. Note: This doesn't always match the contributor count shown on the home page of GitHub repositories. It may be that number includes the contributors with private email addresses.
 - **Status**: Combined status of the latest commit to the default branch. Status will typically indicate the result of continuous integration checks.
-- **License**: Repository license as [detected by GitHub](https://help.github.com/articles/licensing-a-repository/) from a license file in the root of the repository. Note this does not necessarily guarantee all content in the repository has that license.
+- **License**: Repository license as [detected by GitHub](https://help.github.com/articles/licensing-a-repository/) from a license file in the root of the repository. Note: This does not necessarily guarantee all content in the repository has that license.
   - `none`: There is no license file.
   - `unrecognized: There is a license file but it did not match a standard license type.
 - **Language**: The primary programming language of the repository, as detected by GitHub.
 - **Repo Description**: The repository description, as shown at the top of its home page.
 - **GitHub Topics**: The repository's [topics](https://help.github.com/articles/about-topics/).
 - **In Library Manager**: Whether the repository is listed in the [Arduino Library manager index](https://github.com/arduino/Arduino/wiki/Library-Manager-FAQ).
-- **LM name**: Value of the `name` field found in the library.properties metadata file used by the Arduino IDE. Note, these values are taken from the tip of the repository's default branch, not from the [Arduino Library Manager index file](http://downloads.arduino.cc/libraries/library_index.json), which populates them only from tagged versions. You can find more information on these fields in the [Arduino Library Specification](https://github.com/arduino/Arduino/wiki/Arduino-IDE-1.5:-Library-specification#libraryproperties-file-format).
+- **LM name**: Value of the `name` field found in the library.properties metadata file used by the Arduino IDE. Note: These values are taken from the tip of the repository's default branch, not from the [Arduino Library Manager index file](http://downloads.arduino.cc/libraries/library_index.json), which populates them only from tagged versions. You can find more information on these fields in the [Arduino Library Specification](https://github.com/arduino/Arduino/wiki/Arduino-IDE-1.5:-Library-specification#libraryproperties-file-format).
 - **LM version**
 - **LM author**
 - **LM maintainer**
@@ -49,7 +49,7 @@ An list of thousands of [Arduino](http://arduino.cc) library GitHub repositories
 - **LM category**
 - **LM url**
 - **LM architectures**
-- **PIO name**: Value of the `name` field found in the library.json metadata file used by PlatformIO. Note, these values are taken from the tip of the repository's default branch, not from the PlatformIO Library Registry. You can find more information on these fields in the [library.json documentation](http://docs.platformio.org/en/latest/librarymanager/config.html).
+- **PIO name**: Value of the `name` field found in the library.json metadata file used by PlatformIO. Note: These values are taken from the tip of the repository's default branch, not from the PlatformIO Library Registry. You can find more information on these fields in the [library.json documentation](http://docs.platformio.org/en/latest/librarymanager/config.html).
 - **PIO description**
 - **PIO keywords**
 - **PIO authors**
