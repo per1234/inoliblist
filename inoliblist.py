@@ -286,6 +286,9 @@ github_token = None
 enable_verbosity = False
 # setting these to 0 will force a check to determine the actual values on the first request
 last_api_requests_remaining_value = {"search": 0, "core": 0}
+source_count = 0
+non_blacklisted_source_count = 0
+non_blacklisted_unique_source_count = 0
 
 
 def main():
@@ -755,8 +758,13 @@ def populate_row(repository_object, in_library_manager, verify):
     verify -- whether to verify the repository contains an Arduino library (allowed values: True, False)
     """
     global table
+    global source_count
+    global non_blacklisted_source_count
+    global non_blacklisted_unique_source_count
 
     logger.info("Attempting to populate row for: " + repository_object["html_url"])
+
+    source_count += 1
 
     # check if the repo name is blacklisted
     if verify:
@@ -773,12 +781,16 @@ def populate_row(repository_object, in_library_manager, verify):
             logger.info("Skipping blacklisted repository name: " + repository_object["html_url"])
             return
 
+    non_blacklisted_source_count += 1
+
     # check if it's already on the list
     for readRow in table:
         if readRow[Column.repository_url] == repository_object["html_url"]:
             # it's already on the list
             logger.info("Skipping duplicate: " + repository_object["html_url"])
             return
+
+    non_blacklisted_unique_source_count += 1
 
     # initialize the row list
     row_list = [""] * Column.count
@@ -1337,6 +1349,9 @@ def get_contributor_count(repository_object):
 
 def create_output_file():
     """Do final formatting of the table. Write it as a tab separated file."""
+    print("Number of sources: " + str(source_count))
+    print("Number of sources with non-blacklisted repository name: " + str(non_blacklisted_source_count))
+    print("Number of non-blacklisted, unique sources: " + str(non_blacklisted_unique_source_count))
     list_count = len(table) - 1
     print("\nNumber of libraries found: " + str(list_count))
     if list_count == 0:
