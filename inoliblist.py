@@ -2,8 +2,6 @@
 import argparse
 # for writing the CSV file
 import csv
-# for automatically generating unique column indexes
-import enum
 # for URL request errors
 import http.client
 # for parsing Library Manager index
@@ -195,94 +193,87 @@ logging.basicConfig(level="OFF")
 logger = logging.getLogger(__name__)
 
 
-# ensure all columns are given unique indexes
-@enum.unique
-# automatically define column indexes
-class ColumnEnum(enum.IntEnum):
-    repository_url = 0
-    repository_owner = enum.auto()
-    repository_name = enum.auto()
-    repository_default_branch = enum.auto()
-    library_path = enum.auto()
-    archived = enum.auto()
-    is_fork = enum.auto()
-    fork_of = enum.auto()
-    last_push_date = enum.auto()
-    fork_count = enum.auto()
-    star_count = enum.auto()
-    contributor_count = enum.auto()
-    tip_status = enum.auto()
-    repository_license = enum.auto()
-    repository_language = enum.auto()
-    repository_description = enum.auto()
-    github_topics = enum.auto()
-    in_library_manager_index = enum.auto()
-    # in_platformio_library_registry = enum.auto()
-    library_manager_name = enum.auto()
-    library_manager_version = enum.auto()
-    library_manager_author = enum.auto()
-    library_manager_maintainer = enum.auto()
-    library_manager_sentence = enum.auto()
-    library_manager_paragraph = enum.auto()
-    library_manager_category = enum.auto()
-    library_manager_url = enum.auto()
-    library_manager_architectures = enum.auto()
-    platformio_name = enum.auto()
-    platformio_description = enum.auto()
-    platformio_keywords = enum.auto()
-    platformio_authors = enum.auto()
-    platformio_repository = enum.auto()
-    platformio_version = enum.auto()
-    platformio_license = enum.auto()
-    platformio_download_url = enum.auto()
-    platformio_homepage = enum.auto()
-    platformio_frameworks = enum.auto()
-    platformio_platforms = enum.auto()
-    count = enum.auto()
-
-
-# convert the enums to ints
 class Column:
-    repository_url = int(ColumnEnum.repository_url)
-    repository_owner = int(ColumnEnum.repository_owner)
-    repository_name = int(ColumnEnum.repository_name)
-    repository_default_branch = int(ColumnEnum.repository_default_branch)
-    library_path = int(ColumnEnum.library_path)
-    archived = int(ColumnEnum.archived)
-    is_fork = int(ColumnEnum.is_fork)
-    fork_of = int(ColumnEnum.fork_of)
-    last_push_date = int(ColumnEnum.last_push_date)
-    fork_count = int(ColumnEnum.fork_count)
-    star_count = int(ColumnEnum.star_count)
-    contributor_count = int(ColumnEnum.contributor_count)
-    tip_status = int(ColumnEnum.tip_status)
-    repository_license = int(ColumnEnum.repository_license)
-    repository_language = int(ColumnEnum.repository_language)
-    repository_description = int(ColumnEnum.repository_description)
-    github_topics = int(ColumnEnum.github_topics)
-    in_library_manager_index = int(ColumnEnum.in_library_manager_index)
-    # in_platformio_library_registry=int(ColumnEnum.in_platformio_library_registry)
-    library_manager_name = int(ColumnEnum.library_manager_name)
-    library_manager_version = int(ColumnEnum.library_manager_version)
-    library_manager_author = int(ColumnEnum.library_manager_author)
-    library_manager_maintainer = int(ColumnEnum.library_manager_maintainer)
-    library_manager_sentence = int(ColumnEnum.library_manager_sentence)
-    library_manager_paragraph = int(ColumnEnum.library_manager_paragraph)
-    library_manager_category = int(ColumnEnum.library_manager_category)
-    library_manager_url = int(ColumnEnum.library_manager_url)
-    library_manager_architectures = int(ColumnEnum.library_manager_architectures)
-    platformio_name = int(ColumnEnum.platformio_name)
-    platformio_description = int(ColumnEnum.platformio_description)
-    platformio_keywords = int(ColumnEnum.platformio_keywords)
-    platformio_authors = int(ColumnEnum.platformio_authors)
-    platformio_repository = int(ColumnEnum.platformio_repository)
-    platformio_version = int(ColumnEnum.platformio_version)
-    platformio_license = int(ColumnEnum.platformio_license)
-    platformio_download_url = int(ColumnEnum.platformio_download_url)
-    platformio_homepage = int(ColumnEnum.platformio_homepage)
-    platformio_frameworks = int(ColumnEnum.platformio_frameworks)
-    platformio_platforms = int(ColumnEnum.platformio_platforms)
-    count = int(ColumnEnum.count)
+    column_counter = 0
+    repository_url = column_counter
+    column_counter += 1
+    repository_owner = column_counter
+    column_counter += 1
+    repository_name = column_counter
+    column_counter += 1
+    repository_default_branch = column_counter
+    column_counter += 1
+    library_path = column_counter
+    column_counter += 1
+    archived = column_counter
+    column_counter += 1
+    is_fork = column_counter
+    column_counter += 1
+    fork_of = column_counter
+    column_counter += 1
+    last_push_date = column_counter
+    column_counter += 1
+    fork_count = column_counter
+    column_counter += 1
+    star_count = column_counter
+    column_counter += 1
+    contributor_count = column_counter
+    column_counter += 1
+    tip_status = column_counter
+    column_counter += 1
+    repository_license = column_counter
+    column_counter += 1
+    repository_language = column_counter
+    column_counter += 1
+    repository_description = column_counter
+    column_counter += 1
+    github_topics = column_counter
+    column_counter += 1
+    in_library_manager_index = column_counter
+    column_counter += 1
+    # in_platformio_library_registry = column_counter
+    # column_counter += 1
+    library_manager_name = column_counter
+    column_counter += 1
+    library_manager_version = column_counter
+    column_counter += 1
+    library_manager_author = column_counter
+    column_counter += 1
+    library_manager_maintainer = column_counter
+    column_counter += 1
+    library_manager_sentence = column_counter
+    column_counter += 1
+    library_manager_paragraph = column_counter
+    column_counter += 1
+    library_manager_category = column_counter
+    column_counter += 1
+    library_manager_url = column_counter
+    column_counter += 1
+    library_manager_architectures = column_counter
+    column_counter += 1
+    platformio_name = column_counter
+    column_counter += 1
+    platformio_description = column_counter
+    column_counter += 1
+    platformio_keywords = column_counter
+    column_counter += 1
+    platformio_authors = column_counter
+    column_counter += 1
+    platformio_repository = column_counter
+    column_counter += 1
+    platformio_version = column_counter
+    column_counter += 1
+    platformio_license = column_counter
+    column_counter += 1
+    platformio_download_url = column_counter
+    column_counter += 1
+    platformio_homepage = column_counter
+    column_counter += 1
+    platformio_frameworks = column_counter
+    column_counter += 1
+    platformio_platforms = column_counter
+    column_counter += 1
+    count = column_counter
 
 
 # globals
