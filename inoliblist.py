@@ -178,6 +178,9 @@ library_subfolder_blacklist = ["^\..*",  # starts with .
                                "^www"
                                ]
 
+# GitHub topics that will cause verification to fail
+topic_blacklist = ["arduino-sketch"]
+
 unrecognized_license_identifier = "unrecognized"
 no_license_identifier = "none"
 
@@ -783,6 +786,17 @@ def populate_row(repository_object, in_library_manager, verify):
             # skip this repository
             logger.info("Skipping blacklisted repository name: " + repository_object["html_url"])
             return
+
+    # check if the repo has a blacklisted GitHub topic
+    if verify:
+        for blacklisted_topic in topic_blacklist:
+            if blacklisted_topic in repository_object["topics"]:
+                logger.info(
+                    "Skipping (library verification failed due to having the blacklisted \"" +
+                    blacklisted_topic +
+                    "\" GitHub topic)"
+                )
+                return
 
     non_blacklisted_source_count += 1
 

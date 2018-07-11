@@ -47,6 +47,7 @@ class TestInoLibraryList(unittest.TestCase):
     # examples folder in root:n
     # license:n
     # contributor count:1
+    # blacklisted topic:y
     repository_object_triatebr_aprenda_arduino = get_json_from_url(
         url="https://api.github.com/repos/triatebr/aprenda-arduino"
     )
@@ -54,6 +55,7 @@ class TestInoLibraryList(unittest.TestCase):
     # https://github.com/Alexed98/first
     # empty repository
     # fork:n
+    # blacklisted topic:n
     repository_object_alexed98_first = get_json_from_url(url="https://api.github.com/repos/Alexed98/first")
 
     # https://github.com/arduino/forum-issues
@@ -67,6 +69,7 @@ class TestInoLibraryList(unittest.TestCase):
     # examples folder in root:n
     # license:n
     # contributor count:3
+    # blacklisted topic:n
     repository_object_arduino_forum_issues = get_json_from_url(url="https://api.github.com/repos/arduino/forum-issues")
 
     # https://github.com/sparkfun/phant-arduino
@@ -80,6 +83,7 @@ class TestInoLibraryList(unittest.TestCase):
     # examples folder in root:y
     # license:unrecognized
     # contributor count:2
+    # blacklisted topic:n
     # unset the token so it can be used in test_get_json_from_url_token_not_defined
     set_github_token(github_token_input=None)
     repository_object_sparkfun_phant_arduino = get_json_from_url(
@@ -99,6 +103,7 @@ class TestInoLibraryList(unittest.TestCase):
     # examples folder in root:n
     # license:n
     # contributor count:0
+    # blacklisted topic:n
     # set send_token=False so it can be used in test_get_json_from_url_unauthenticated
     repository_object_veberarnaud_shiftregister__arduinolibrary = get_json_from_url(
         url="https://api.github.com/repos/VEBERArnaud/ShiftRegister__ArduinoLibrary"
@@ -115,6 +120,7 @@ class TestInoLibraryList(unittest.TestCase):
     # examples folder in root:y
     # license:MIT
     # contributor count:1
+    # blacklisted topic:n
     repository_object_spaceshipyard_arduinojsonrpc = get_json_from_url(
         url="https://api.github.com/repos/spaceshipyard/ArduinoJsonRpc"
     )
@@ -131,6 +137,7 @@ class TestInoLibraryList(unittest.TestCase):
     # only administrative files in root:n
     # license:LGPL-3.0
     # contributor count:2
+    # blacklisted topic:n
     repository_object_mheironimus_arduinojoysticklibrary = get_json_from_url(
         url="https://api.github.com/repos/MHeironimus/ArduinoJoystickLibrary"
     )
@@ -147,6 +154,7 @@ class TestInoLibraryList(unittest.TestCase):
     # only administrative files in root:n
     # license:MIT
     # contributor count:1
+    # blacklisted topic:n
     repository_object_menan_sparkjson = get_json_from_url(url="https://api.github.com/repos/menan/SparkJson"
                                                           )
 
@@ -161,6 +169,7 @@ class TestInoLibraryList(unittest.TestCase):
     # examples folder in root:n
     # license:MIT
     # contributor count:1
+    # blacklisted topic:y
     repository_object_chen_yumin_skittle_color_sorter = get_json_from_url(
         url="https://api.github.com/repos/chen-yumin/skittle-color-sorter"
     )
@@ -176,6 +185,7 @@ class TestInoLibraryList(unittest.TestCase):
     # examples folder in root:y
     # license:MIT
     # contributor count:9
+    # blacklisted topic:n
     repository_object_bblanchon_arduinojson = get_json_from_url(
         url="https://api.github.com/repos/bblanchon/ArduinoJson"
     )
@@ -210,8 +220,27 @@ class TestInoLibraryList(unittest.TestCase):
     # only administrative files in root:n
     # license:MIT
     # contributor count:3
+    # blacklisted topic:n
     repository_object_per1234_watchdoglog = get_json_from_url(
         url="https://api.github.com/repos/per1234/watchdoglog"
+    )
+
+    # https://github.com/SandeepanSengupta/miniDAC-library
+    # folder count:2
+    # archived:n
+    # active:y
+    # fork:y
+    # library.properties:y
+    # library.json:n
+    # header:/
+    # sketch in root:n
+    # examples folder in root:y
+    # only administrative files in root:n
+    # license:n
+    # contributor count:3
+    # blacklisted topic:y
+    repository_object_SandeepanSengupta_miniDAC_library = get_json_from_url(
+        url="https://api.github.com/repos/SandeepanSengupta/miniDAC-library"
     )
 
     def setUp(self):
@@ -432,6 +461,12 @@ class TestInoLibraryList(unittest.TestCase):
                   newline=file_newline
                   ) as failed_verification_list:
             self.assertEqual(failed_verification_list.read(), str(repository_object["html_url"]) + '\n')
+
+    def test_populate_row_verify_fail_blacklisted_topic(self):
+        # requirements: has blacklisted topic ("arduino-sketch")
+        repository_object = TestInoLibraryList.repository_object_SandeepanSengupta_miniDAC_library["json_data"]
+        populate_row(repository_object=repository_object, in_library_manager=True, verify=True)
+        self.assertEqual(len(get_table()), 1)
 
     def test_find_library_folder_library_dot_properties_in_root(self):
         # requirements: library.properties in the root, no library.json in the root, no header in root
