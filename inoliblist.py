@@ -60,10 +60,12 @@ maximum_search_retries = 10
 
 # when verification is enabled, repositories that match the following regular expressions will be skipped
 repository_name_blacklist = ["^arduino$",
+                             "^arduino.*libs$",
                              "^arduino.*project.$",
                              "^arduino.*libraries.$",
                              "^arduino.*project.$",
                              "^libraries$",
+                             "^my.*arduino.*librar(y)|(ies).*$",
                              ".*sketches.*",
                              ".*sketchbook.*"
                              ]
