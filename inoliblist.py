@@ -365,7 +365,8 @@ def populate_table():
                         created_argument_list=["<=2018-05-29",
                                                ">=2018-05-30"],
                         fork_argument="true",
-                        verify=False)
+                        verify=False,
+                        log_verification_failures=False)
 
     logger.info("Processing GitHub's arduino topic.")
     search_repositories(search_query="topic:arduino",
@@ -379,7 +380,8 @@ def populate_table():
                                                "2018-03-08..2018-06-05",
                                                ">=2018-06-06"],
                         fork_argument="true",
-                        verify=True)
+                        verify=True,
+                        log_verification_failures=False)
 
     logger.info("Processing GitHub search for arduino library.")
     search_repositories(search_query="arduino+library+topics:0+language:cpp+language:c+language:arduino",
@@ -396,7 +398,8 @@ def populate_table():
                                                "2018-02-01..2018-06-12",
                                                ">=2018-06-13"],
                         fork_argument="false",
-                        verify=True)
+                        verify=True,
+                        log_verification_failures=True)
 
 
 def initialize_table():
@@ -684,11 +687,12 @@ def process_library_manager_index(json_data):
                 repository_name = repository_url.split('/')[3] + '/' + repository_url.split('/')[4][:-4]
                 populate_row(repository_object=get_github_api_response(request="repos/" + repository_name)["json_data"],
                              in_library_manager=True,
-                             verify=False)
+                             verify=False,
+                             log_verification_failures=False)
             last_repository_url = repository_url
 
 
-def search_repositories(search_query, created_argument_list, fork_argument, verify):
+def search_repositories(search_query, created_argument_list, fork_argument, verify, log_verification_failures):
     """Use the GitHub API to search for repositories and pass the results to populate_row()
     (see: https://developer.github.com/v3/search/#search-repositories)
 
@@ -699,6 +703,7 @@ def search_repositories(search_query, created_argument_list, fork_argument, veri
     fork_argument -- fork filter. Valid values are "true", "false", "only".
                      (see: https://help.github.com/articles/searching-in-forks/)
     verify -- whether to verify that results contain an Arduino library (allowed values: True, False)
+    log_verification_failures -- whether to save a list of the repositories that failed verification
     """
     for created_argument in created_argument_list:
         search_results_count = 0
@@ -744,7 +749,10 @@ def search_repositories(search_query, created_argument_list, fork_argument, veri
             for repository_object in json_data["items"]:
                 search_results_count += 1
 
-                populate_row(repository_object=repository_object, in_library_manager=False, verify=verify)
+                populate_row(repository_object=repository_object,
+                             in_library_manager=False,
+                             verify=verify,
+                             log_verification_failures=log_verification_failures)
 
             if not additional_pages and search_results_count < json_data["total_count"]:
                 # GitHub's search API provides data for a maximum of 1000 search results
@@ -762,13 +770,14 @@ def search_repositories(search_query, created_argument_list, fork_argument, veri
                     )
 
 
-def populate_row(repository_object, in_library_manager, verify):
+def populate_row(repository_object, in_library_manager, verify, log_verification_failures):
     """Populate a row of the list with data for the repository.
 
     Keyword arguments:
     repository_object -- object containing the GitHub API data for a repository
     in_library_manager -- value to store in the "In Library Manager" column (True, False)
     verify -- whether to verify the repository contains an Arduino library (allowed values: True, False)
+    log_verification_failures -- whether to save a list of the repositories that failed verification
     """
     global table
     global source_count
@@ -826,13 +835,14 @@ def populate_row(repository_object, in_library_manager, verify):
         if verify:
             # verification is required and a library was not found so skip the repo
             logger.info("Skipping (library verification failed)")
-            # add the repo's URL to the failed verification list
-            with open(output_folder_name + "/" + verification_failed_list_filename,
-                      mode="a",
-                      encoding=file_encoding,
-                      newline=''
-                      ) as failed_verification_list:
-                failed_verification_list.write(str(repository_object["html_url"]) + '\n')
+            if log_verification_failures:
+                # add the repo's URL to the failed verification list
+                with open(output_folder_name + "/" + verification_failed_list_filename,
+                          mode="a",
+                          encoding=file_encoding,
+                          newline=''
+                          ) as failed_verification_list:
+                    failed_verification_list.write(str(repository_object["html_url"]) + '\n')
             return
         library_folder = ""
 

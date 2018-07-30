@@ -342,14 +342,16 @@ class TestInoLibraryList(unittest.TestCase):
         search_repositories(search_query="ethernet+in:name+org:arduino-libraries",
                             created_argument_list=[">=2013-01-01"],
                             fork_argument="false",
-                            verify=False)
+                            verify=False,
+                            log_verification_failures=False)
         self.assertEqual(get_table()[1][Column.repository_url], "https://github.com/arduino-libraries/Ethernet")
 
     def test_search_repositories_created_argument_list(self):
         search_repositories(search_query="ethernet+in:name+org:arduino-libraries",
                             created_argument_list=["<=2012-01-01", "2013-01-01..2014-01-01"],
                             fork_argument="false",
-                            verify=False)
+                            verify=False,
+                            log_verification_failures=False)
         # created_at == 2015-03-27T09:54:12Z so this will return no results if the created_argument_list handling is
         # correct
         self.assertEqual(len(get_table()), 1)
@@ -358,7 +360,8 @@ class TestInoLibraryList(unittest.TestCase):
         search_repositories(search_query="watchdoglog+in:name+user:per1234",
                             created_argument_list=[">2013-01-01"],
                             fork_argument="only",
-                            verify=False)
+                            verify=False,
+                            log_verification_failures=False)
         # search defaults to fork:false so if fork_argument handling is not working this search would give no results
         self.assertEqual(len(get_table()), 2)
 
@@ -366,7 +369,8 @@ class TestInoLibraryList(unittest.TestCase):
         search_repositories(search_query="eepromutility+in:name+user:per1234",
                             created_argument_list=["<2018-06-06"],
                             fork_argument="false",
-                            verify=True)
+                            verify=True,
+                            log_verification_failures=False)
         # repository does not meet the verification requirements so it should not be added to the table
         self.assertEqual(len(get_table()), 1)
 
@@ -374,14 +378,18 @@ class TestInoLibraryList(unittest.TestCase):
         search_repositories(search_query="arduino+in:name+user:Firmata",
                             created_argument_list=["2012-01-19"],
                             fork_argument="false",
-                            verify=True)
+                            verify=True,
+                            log_verification_failures=False)
         # repository name is blacklisted so it should not be added to the table
         self.assertEqual(len(get_table()), 1)
 
     def test_populate_row(self):
         # requirements: library.properties, library.json, contributor count >0
         repository_object = TestInoLibraryList.repository_object_bblanchon_arduinojson["json_data"]
-        populate_row(repository_object=repository_object, in_library_manager=True, verify=False)
+        populate_row(repository_object=repository_object,
+                     in_library_manager=True,
+                     verify=False,
+                     log_verification_failures=False)
         self.assertEqual(get_table()[1][Column.repository_url], "https://github.com/bblanchon/ArduinoJson")
         self.assertEqual(get_table()[1][Column.repository_owner], "bblanchon")
         self.assertEqual(get_table()[1][Column.repository_name], "ArduinoJson")
@@ -433,26 +441,38 @@ class TestInoLibraryList(unittest.TestCase):
     def test_populate_row_fork_of(self):
         # requirements: fork
         repository_object = TestInoLibraryList.repository_object_per1234_watchdoglog["json_data"]
-        populate_row(repository_object=repository_object, in_library_manager=True, verify=False)
+        populate_row(repository_object=repository_object,
+                     in_library_manager=True,
+                     verify=False,
+                     log_verification_failures=False)
         self.assertEqual(get_table()[1][Column.fork_of], "Megunolink/ArduinoCrashMonitor")
 
     def test_populate_row_no_verify(self):
         # requirements: fail verification, no subfolders
         repository_object = TestInoLibraryList.repository_object_arduino_forum_issues["json_data"]
-        populate_row(repository_object=repository_object, in_library_manager=True, verify=False)
+        populate_row(repository_object=repository_object,
+                     in_library_manager=True,
+                     verify=False,
+                     log_verification_failures=False)
         # check the last row of the table for the populated row
         self.assertEqual(len(get_table()), 2)
 
     def test_populate_row_verify_pass(self):
         # requirements: pass verification
         repository_object = TestInoLibraryList.repository_object_sparkfun_phant_arduino["json_data"]
-        populate_row(repository_object=repository_object, in_library_manager=True, verify=True)
+        populate_row(repository_object=repository_object,
+                     in_library_manager=True,
+                     verify=True,
+                     log_verification_failures=False)
         self.assertEqual(len(get_table()), 2)
 
-    def test_populate_row_verify_fail(self):
+    def test_populate_row_verify_fail_log(self):
         # requirements: fail verification
         repository_object = TestInoLibraryList.repository_object_arduino_forum_issues["json_data"]
-        populate_row(repository_object=repository_object, in_library_manager=True, verify=True)
+        populate_row(repository_object=repository_object,
+                     in_library_manager=True,
+                     verify=True,
+                     log_verification_failures=True)
         self.assertEqual(len(get_table()), 1)
         # the repo should have been added to the failed verification list
         with open(file=output_folder_name + "/" + verification_failed_list_filename,
@@ -462,10 +482,30 @@ class TestInoLibraryList(unittest.TestCase):
                   ) as failed_verification_list:
             self.assertEqual(failed_verification_list.read(), str(repository_object["html_url"]) + '\n')
 
+    def test_populate_row_verify_fail_no_log(self):
+        # requirements: fail verification
+        repository_object = TestInoLibraryList.repository_object_arduino_forum_issues["json_data"]
+        populate_row(repository_object=repository_object,
+                     in_library_manager=True,
+                     verify=True,
+                     log_verification_failures=False)
+        self.assertEqual(len(get_table()), 1)
+        # there should be no verification failed list
+        with self.assertRaises(FileNotFoundError):
+            with open(file=output_folder_name + "/" + verification_failed_list_filename,
+                      mode='r',
+                      encoding=file_encoding,
+                      newline=file_newline
+                      ):
+                pass
+
     def test_populate_row_verify_fail_blacklisted_topic(self):
         # requirements: has blacklisted topic ("arduino-sketch")
         repository_object = TestInoLibraryList.repository_object_SandeepanSengupta_miniDAC_library["json_data"]
-        populate_row(repository_object=repository_object, in_library_manager=True, verify=True)
+        populate_row(repository_object=repository_object,
+                     in_library_manager=True,
+                     verify=True,
+                     log_verification_failures=False)
         self.assertEqual(len(get_table()), 1)
 
     def test_find_library_folder_library_dot_properties_in_root(self):
@@ -647,7 +687,8 @@ class TestInoLibraryList(unittest.TestCase):
     def test_create_output_file(self):
         populate_row(repository_object=TestInoLibraryList.repository_object_sparkfun_phant_arduino["json_data"],
                      in_library_manager=True,
-                     verify=False)
+                     verify=False,
+                     log_verification_failures=False)
         create_output_file()
         with open(file=output_folder_name + "/" + output_filename,
                   mode='r',
