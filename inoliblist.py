@@ -90,8 +90,10 @@ administrative_file_whitelist = ["^\..*",  # starts with .
                                  "^platformio.ini$"
                                  ]
 
-# library header file extensions recognized by the Arduino IDE
-header_file_extensions = [".h", ".hh", ".hpp"]
+# library header file extensions recognized by the Arduino IDE and their incorrect-case variants
+# The Arduino IDE only recognizes the all lower case extensions but the incorrect case indicates the author at least
+# intended it to be a header file
+header_file_extensions = [".h", ".H", ".hh", ".Hh", ".HH", ".hpp", ".Hpp", ".HPP"]
 
 # regular expressions for common library examples folder names
 examples_folder_names = ["^examples$",
