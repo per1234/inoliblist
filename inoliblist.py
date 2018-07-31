@@ -42,7 +42,14 @@ urlopen_retry_exceptions = ["HTTPError: HTTP Error 403",
                             "RemoteDisconnected",
                             # ConnectionResetError: [Errno 104] Connection reset by peer
                             # https://circleci.com/gh/per1234/inoliblist/25
-                            "ConnectionResetError"
+                            "ConnectionResetError",
+                            # ConnectionRefusedError: [WinError 10061] No connection could be made because the target
+                            # machine actively refused it
+                            "ConnectionRefusedError",
+                            # urllib.error.URLError: <urlopen error [WinError 10061] No connection could be made because
+                            # the target machine actively refused it>
+                            "<urlopen error [WinError 10061] No connection could be made because the target machine "
+                            "actively refused it>"
                             ]
 
 # delay before retry after failed urlopen (seconds)
