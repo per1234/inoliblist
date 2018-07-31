@@ -384,7 +384,7 @@ def populate_table():
                         log_verification_failures=False)
 
     logger.info("Processing GitHub search for arduino library.")
-    search_repositories(search_query="arduino+library+topics:0+language:cpp+language:c+language:arduino",
+    search_repositories(search_query="arduino+library+NOT+mongoose+topics:0+language:cpp+language:c+language:arduino",
                         created_argument_list=["<=2012-12-25",
                                                "2012-12-26..2013-12-27",
                                                "2013-12-28..2014-10-05",
