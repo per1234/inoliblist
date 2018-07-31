@@ -28,7 +28,7 @@ rate_limit_reset_wait_notification_interval = 300
 # (s) delay after rate limit reset time to make sure it has actually reset before the next API request
 rate_limit_reset_wait_additional_delay = 180
 
-# call check_rate_limiting() after an exception that stars with this string
+# call check_rate_limiting() after an exception that starts with this string
 # urllib.error.HTTPError: HTTP Error 503: Service Unavailable
 check_rate_limiting_after_exception = "HTTPError: HTTP Error 503"
 # retry urlopen after exceptions that start with the following strings
