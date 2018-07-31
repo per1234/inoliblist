@@ -384,22 +384,23 @@ def populate_table():
                         log_verification_failures=False)
 
     logger.info("Processing GitHub search for arduino library.")
-    search_repositories(search_query="arduino+library+NOT+mongoose+topics:0+language:cpp+language:c+language:arduino",
-                        created_argument_list=["<=2012-12-25",
-                                               "2012-12-26..2013-12-27",
-                                               "2013-12-28..2014-10-05",
-                                               "2014-10-06..2015-04-28",
-                                               "2015-04-29..2015-11-25",
-                                               "2015-11-26..2016-05-18",
-                                               "2016-05-19..2016-11-20",
-                                               "2016-11-21..2017-04-14",
-                                               "2017-04-15..2017-09-18",
-                                               "2017-09-19..2018-01-31",
-                                               "2018-02-01..2018-06-12",
-                                               ">=2018-06-13"],
-                        fork_argument="false",
-                        verify=True,
-                        log_verification_failures=True)
+    search_repositories(
+        search_query="arduino+library+NOT+mongoose+NOT+particle+topics:0+language:cpp+language:c+language:arduino",
+        created_argument_list=["<=2012-12-25",
+                               "2012-12-26..2013-12-27",
+                               "2013-12-28..2014-10-05",
+                               "2014-10-06..2015-04-28",
+                               "2015-04-29..2015-11-25",
+                               "2015-11-26..2016-05-18",
+                               "2016-05-19..2016-11-20",
+                               "2016-11-21..2017-04-14",
+                               "2017-04-15..2017-09-18",
+                               "2017-09-19..2018-01-31",
+                               "2018-02-01..2018-06-12",
+                               ">=2018-06-13"],
+        fork_argument="false",
+        verify=True,
+        log_verification_failures=True)
 
 
 def initialize_table():
