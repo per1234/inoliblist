@@ -72,7 +72,7 @@ repository_name_blacklist = ["^arduino$",
                              "^arduino.*libraries$",
                              "^arduino.*project.$",
                              "^libraries$",
-                             "^my.*arduino.*librar(y)|(ies).*$",
+                             "^my.*arduino.*librar((y)|(ies)).*$",
                              ".*sketches.*",
                              ".*sketchbook.*"
                              ]
