@@ -204,7 +204,16 @@ library_subfolder_blacklist = ["^\..*",  # starts with .
                                ]
 
 # GitHub topics that will cause verification to fail
-topic_blacklist = ["arduino-sketch"]
+topic_blacklist = [
+    "arduino-sketch",
+    "mongoose-os",
+    "particle",
+    "particle-core",
+    "particle-devices",
+    "particle-electron",
+    "particle-io",
+    "particle-photon"
+]
 
 unrecognized_license_identifier = "unrecognized"
 no_license_identifier = "none"
