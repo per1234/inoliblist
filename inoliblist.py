@@ -69,7 +69,7 @@ maximum_search_retries = 10
 repository_name_blacklist = ["^arduino$",
                              "^arduino.*libs$",
                              "^arduino.*project.$",
-                             "^arduino.*libraries.$",
+                             "^arduino.*libraries$",
                              "^arduino.*project.$",
                              "^libraries$",
                              "^my.*arduino.*librar(y)|(ies).*$",
