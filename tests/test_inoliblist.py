@@ -23,7 +23,7 @@ argument = argument_parser.parse_args()
 sys.argv[1:] = argument.unittest_args
 
 
-class TestInoLibraryList(unittest.TestCase):
+class TestInoliblist(unittest.TestCase):
     # NOTE: the tests are run in order sorted by method name, not in the order below
 
     # uncomment for debugging
@@ -287,25 +287,25 @@ class TestInoLibraryList(unittest.TestCase):
 
     def test_get_json_from_url(self):
         # requirements: none
-        self.assertEqual(TestInoLibraryList.repository_object_arduino_forum_issues["json_data"]["name"], "forum-issues")
-        self.assertFalse(TestInoLibraryList.repository_object_arduino_forum_issues["additional_pages"])
-        self.assertEqual(TestInoLibraryList.repository_object_arduino_forum_issues["page_count"], 1)
+        self.assertEqual(TestInoliblist.repository_object_arduino_forum_issues["json_data"]["name"], "forum-issues")
+        self.assertFalse(TestInoliblist.repository_object_arduino_forum_issues["additional_pages"])
+        self.assertEqual(TestInoliblist.repository_object_arduino_forum_issues["page_count"], 1)
 
     def test_get_json_from_url_token_not_defined(self):
         # GitHub Personal Access Token will not be defined during CI of pull requests
-        self.assertEqual(TestInoLibraryList.repository_object_sparkfun_phant_arduino["json_data"]["name"],
+        self.assertEqual(TestInoliblist.repository_object_sparkfun_phant_arduino["json_data"]["name"],
                          "phant-arduino")
-        self.assertFalse(TestInoLibraryList.repository_object_sparkfun_phant_arduino["additional_pages"])
-        self.assertEqual(TestInoLibraryList.repository_object_sparkfun_phant_arduino["page_count"], 1)
+        self.assertFalse(TestInoliblist.repository_object_sparkfun_phant_arduino["additional_pages"])
+        self.assertEqual(TestInoliblist.repository_object_sparkfun_phant_arduino["page_count"], 1)
 
     def test_get_json_from_url_unauthenticated(self):
         # requirements: none
         self.assertEqual(
-            TestInoLibraryList.repository_object_veberarnaud_shiftregister__arduinolibrary["json_data"]["name"],
+            TestInoliblist.repository_object_veberarnaud_shiftregister__arduinolibrary["json_data"]["name"],
             "ShiftRegister__ArduinoLibrary")
         self.assertFalse(
-            TestInoLibraryList.repository_object_veberarnaud_shiftregister__arduinolibrary["additional_pages"])
-        self.assertEqual(TestInoLibraryList.repository_object_veberarnaud_shiftregister__arduinolibrary["page_count"],
+            TestInoliblist.repository_object_veberarnaud_shiftregister__arduinolibrary["additional_pages"])
+        self.assertEqual(TestInoliblist.repository_object_veberarnaud_shiftregister__arduinolibrary["page_count"],
                          1)
 
     # disabled because it causes a delay
@@ -385,7 +385,7 @@ class TestInoLibraryList(unittest.TestCase):
 
     def test_populate_row(self):
         # requirements: library.properties, library.json, contributor count >0
-        repository_object = TestInoLibraryList.repository_object_bblanchon_arduinojson["json_data"]
+        repository_object = TestInoliblist.repository_object_bblanchon_arduinojson["json_data"]
         populate_row(repository_object=repository_object,
                      in_library_manager=True,
                      verify=False,
@@ -440,7 +440,7 @@ class TestInoLibraryList(unittest.TestCase):
 
     def test_populate_row_fork_of(self):
         # requirements: fork
-        repository_object = TestInoLibraryList.repository_object_per1234_watchdoglog["json_data"]
+        repository_object = TestInoliblist.repository_object_per1234_watchdoglog["json_data"]
         populate_row(repository_object=repository_object,
                      in_library_manager=True,
                      verify=False,
@@ -449,7 +449,7 @@ class TestInoLibraryList(unittest.TestCase):
 
     def test_populate_row_no_verify(self):
         # requirements: fail verification, no subfolders
-        repository_object = TestInoLibraryList.repository_object_arduino_forum_issues["json_data"]
+        repository_object = TestInoliblist.repository_object_arduino_forum_issues["json_data"]
         populate_row(repository_object=repository_object,
                      in_library_manager=True,
                      verify=False,
@@ -459,7 +459,7 @@ class TestInoLibraryList(unittest.TestCase):
 
     def test_populate_row_verify_pass(self):
         # requirements: pass verification
-        repository_object = TestInoLibraryList.repository_object_sparkfun_phant_arduino["json_data"]
+        repository_object = TestInoliblist.repository_object_sparkfun_phant_arduino["json_data"]
         populate_row(repository_object=repository_object,
                      in_library_manager=True,
                      verify=True,
@@ -468,7 +468,7 @@ class TestInoLibraryList(unittest.TestCase):
 
     def test_populate_row_verify_fail_log(self):
         # requirements: fail verification
-        repository_object = TestInoLibraryList.repository_object_arduino_forum_issues["json_data"]
+        repository_object = TestInoliblist.repository_object_arduino_forum_issues["json_data"]
         populate_row(repository_object=repository_object,
                      in_library_manager=True,
                      verify=True,
@@ -484,7 +484,7 @@ class TestInoLibraryList(unittest.TestCase):
 
     def test_populate_row_verify_fail_no_log(self):
         # requirements: fail verification
-        repository_object = TestInoLibraryList.repository_object_arduino_forum_issues["json_data"]
+        repository_object = TestInoliblist.repository_object_arduino_forum_issues["json_data"]
         populate_row(repository_object=repository_object,
                      in_library_manager=True,
                      verify=True,
@@ -501,7 +501,7 @@ class TestInoLibraryList(unittest.TestCase):
 
     def test_populate_row_verify_fail_blacklisted_topic(self):
         # requirements: has blacklisted topic ("arduino-sketch")
-        repository_object = TestInoLibraryList.repository_object_SandeepanSengupta_miniDAC_library["json_data"]
+        repository_object = TestInoliblist.repository_object_SandeepanSengupta_miniDAC_library["json_data"]
         populate_row(repository_object=repository_object,
                      in_library_manager=True,
                      verify=True,
@@ -510,39 +510,39 @@ class TestInoLibraryList(unittest.TestCase):
 
     def test_find_library_folder_library_dot_properties_in_root(self):
         # requirements: library.properties in the root, no library.json in the root, no header in root
-        repository_object = TestInoLibraryList.repository_object_sparkfun_phant_arduino["json_data"]
+        repository_object = TestInoliblist.repository_object_sparkfun_phant_arduino["json_data"]
         row_list = [""] * Column.count
         self.assertEqual(find_library_folder(repository_object=repository_object, row_list=row_list, verify=False), '/')
 
     def test_find_library_folder_library_dot_json_in_root(self):
         # requirements: library.json in the root, no library.properties in the root, no header in root
-        repository_object = TestInoLibraryList.repository_object_spaceshipyard_arduinojsonrpc["json_data"]
+        repository_object = TestInoliblist.repository_object_spaceshipyard_arduinojsonrpc["json_data"]
         row_list = [""] * Column.count
         self.assertEqual(find_library_folder(repository_object=repository_object, row_list=row_list, verify=False), '/')
 
     def test_find_library_folder_header_in_root(self):
         # requirements: no metadata and a header file in the root
-        repository_object = TestInoLibraryList.repository_object_veberarnaud_shiftregister__arduinolibrary["json_data"]
+        repository_object = TestInoliblist.repository_object_veberarnaud_shiftregister__arduinolibrary["json_data"]
         row_list = [""] * Column.count
         self.assertEqual(find_library_folder(repository_object=repository_object, row_list=row_list, verify=False), '/')
 
     def test_find_library_folder_metadata_in_subfolder(self):
         # requirements: metadata in subfolder, no header in root, few subfolders
-        repository_object = TestInoLibraryList.repository_object_mheironimus_arduinojoysticklibrary["json_data"]
+        repository_object = TestInoliblist.repository_object_mheironimus_arduinojoysticklibrary["json_data"]
         row_list = [""] * Column.count
         self.assertEqual(find_library_folder(repository_object=repository_object, row_list=row_list, verify=False),
                          "Joystick")
 
     def test_find_library_folder_header_in_subfolder(self):
         # requirements: no metadata, header in subfolder, few subfolders
-        repository_object = TestInoLibraryList.repository_object_menan_sparkjson["json_data"]
+        repository_object = TestInoliblist.repository_object_menan_sparkjson["json_data"]
         row_list = [""] * Column.count
         self.assertEqual(find_library_folder(repository_object=repository_object, row_list=row_list, verify=False),
                          "firmware")
 
     def test_find_library_folder_no_library(self):
         # requirements: no library in root or subfolder, few subfolders
-        repository_object = TestInoLibraryList.repository_object_arduino_forum_issues["json_data"]
+        repository_object = TestInoliblist.repository_object_arduino_forum_issues["json_data"]
         row_list = [""] * Column.count
         self.assertIsNone(find_library_folder(repository_object=repository_object, row_list=row_list, verify=False))
 
@@ -550,43 +550,43 @@ class TestInoLibraryList(unittest.TestCase):
     # TODO: find one repo with space and one repo with non-ASCII characters, both with library in subfolder
     def test_find_library_folder_problematic_path_names(self):
         # requirements: non-ASCII characters and spaces in folder and filenames and no library
-        repository_object = TestInoLibraryList.repository_object_triatebr_aprenda_arduino["json_data"]
+        repository_object = TestInoliblist.repository_object_triatebr_aprenda_arduino["json_data"]
         row_list = [""] * Column.count
         self.assertIsNone(find_library_folder(repository_object=repository_object, row_list=row_list, verify=False))
 
     def test_find_library_folder_verify_metadata_in_root(self):
         # requirements metadata and no header file in root
-        repository_object = TestInoLibraryList.repository_object_sparkfun_phant_arduino["json_data"]
+        repository_object = TestInoliblist.repository_object_sparkfun_phant_arduino["json_data"]
         row_list = [""] * Column.count
         self.assertEqual(find_library_folder(repository_object=repository_object, row_list=row_list, verify=True), '/')
 
     def test_find_library_folder_verify_empty_repository(self):
         # requirements: empty repository
-        repository_object = TestInoLibraryList.repository_object_alexed98_first["json_data"]
+        repository_object = TestInoliblist.repository_object_alexed98_first["json_data"]
         row_list = [""] * Column.count
         self.assertIsNone(find_library_folder(repository_object=repository_object, row_list=row_list, verify=True))
 
     def test_find_library_folder_verify_header_and_sketch_in_root(self):
         # requirements: header and sketch file in root, no metadata in root
-        repository_object = TestInoLibraryList.repository_object_chen_yumin_skittle_color_sorter["json_data"]
+        repository_object = TestInoliblist.repository_object_chen_yumin_skittle_color_sorter["json_data"]
         row_list = [""] * Column.count
         self.assertIsNone(find_library_folder(repository_object=repository_object, row_list=row_list, verify=True))
 
     # TODO: find suitable repo
     # def test_find_library_folder_verify_header_and_sketch_and_examples_in_root(self):
     #   # requirements: (header, sketch file, and examples folder in root, no metadata in root
-    #   repository_object = ["json_data"]
     #   self.assertEqual(find_library_folder(repository_object=repository_object, row_list=row_list, verify=True),'/')
+    #   repository_object = TestInoliblist.["json_data"]
 
     def test_find_library_folder_verify_not_in_root(self):
         # requirements: library in subfolder
-        repository_object = TestInoLibraryList.repository_object_mheironimus_arduinojoysticklibrary["json_data"]
+        repository_object = TestInoliblist.repository_object_mheironimus_arduinojoysticklibrary["json_data"]
         row_list = [""] * Column.count
         self.assertIsNone(find_library_folder(repository_object=repository_object, row_list=row_list, verify=True))
 
     def test_find_library_folder_verify_only_administrative_files_in_root(self):
         # requirements: only administrative files in root, library in subfolder
-        repository_object = TestInoLibraryList.repository_object_going_digital_talkie["json_data"]
+        repository_object = TestInoliblist.repository_object_going_digital_talkie["json_data"]
         row_list = [""] * Column.count
         self.assertEqual(
             find_library_folder(repository_object=repository_object, row_list=row_list, verify=True),
@@ -595,7 +595,7 @@ class TestInoLibraryList(unittest.TestCase):
 
     def test_parse_library_dot_properties_success(self):
         # requirements: library.properties
-        repository_object = TestInoLibraryList.repository_object_sparkfun_phant_arduino["json_data"]
+        repository_object = TestInoliblist.repository_object_sparkfun_phant_arduino["json_data"]
         # initialize the row list
         row_list = [""] * Column.count
         self.assertTrue(parse_library_dot_properties(metadata_folder="/",
@@ -608,7 +608,7 @@ class TestInoLibraryList(unittest.TestCase):
         # initialize the row list
         row_list = [""] * Column.count
         # requirements: any folder (including root) without library.properties
-        repository_object = TestInoLibraryList.repository_object_sparkfun_phant_arduino["json_data"]
+        repository_object = TestInoliblist.repository_object_sparkfun_phant_arduino["json_data"]
         self.assertFalse(parse_library_dot_properties(metadata_folder="src",
                                                       repository_object=repository_object,
                                                       row_list=row_list)
@@ -629,7 +629,7 @@ class TestInoLibraryList(unittest.TestCase):
         # initialize the row list
         row_list = [""] * Column.count
         # requirements: metadata_folder contains valid library.json
-        repository_object = TestInoLibraryList.repository_object_spaceshipyard_arduinojsonrpc["json_data"]
+        repository_object = TestInoliblist.repository_object_spaceshipyard_arduinojsonrpc["json_data"]
         self.assertTrue(parse_library_dot_json(metadata_folder='/',
                                                repository_object=repository_object,
                                                row_list=row_list)
@@ -641,7 +641,7 @@ class TestInoLibraryList(unittest.TestCase):
     #     # initialize the row list
     #     row_list = [""] * Column.count
     #     # requirements: metadata_folder contains library.json with invalid JSON formatting
-    #     repository_object = TestInoLibraryList.["json_data"]
+    #     repository_object = TestInoliblist.["json_data"]
     #     self.assertTrue(
     #         parse_library_dot_json(metadata_folder="/", repository_object=repository_object, row_list=row_list)
     #     )
@@ -653,7 +653,7 @@ class TestInoLibraryList(unittest.TestCase):
         # initialize the row list
         row_list = [""] * Column.count
         # requirements: metadata_folder doesn't contain library.json
-        repository_object = TestInoLibraryList.repository_object_sparkfun_phant_arduino["json_data"]
+        repository_object = TestInoliblist.repository_object_sparkfun_phant_arduino["json_data"]
         self.assertFalse(parse_library_dot_json(metadata_folder="src",
                                                 repository_object=repository_object,
                                                 row_list=row_list)
@@ -661,31 +661,31 @@ class TestInoLibraryList(unittest.TestCase):
 
     def test_get_repository_license_none(self):
         # requirements: no license file
-        repository_object = TestInoLibraryList.repository_object_arduino_forum_issues["json_data"]
+        repository_object = TestInoliblist.repository_object_arduino_forum_issues["json_data"]
         self.assertEqual(get_repository_license(repository_object=repository_object), "none")
 
     def test_get_repository_license_unrecognized(self):
         # requirements: license file but not recognized
-        repository_object = TestInoLibraryList.repository_object_sparkfun_phant_arduino["json_data"]
+        repository_object = TestInoliblist.repository_object_sparkfun_phant_arduino["json_data"]
         self.assertEqual(get_repository_license(repository_object=repository_object), "unrecognized")
 
     def test_get_repository_license_recognized(self):
         # requirements: recognized license file
-        repository_object = TestInoLibraryList.repository_object_spaceshipyard_arduinojsonrpc["json_data"]
+        repository_object = TestInoliblist.repository_object_spaceshipyard_arduinojsonrpc["json_data"]
         self.assertEqual(get_repository_license(repository_object=repository_object), "MIT")
 
     def test_get_contributor_count(self):
         # requirements: >1 contributor
-        repository_object = TestInoLibraryList.repository_object_sparkfun_phant_arduino["json_data"]
+        repository_object = TestInoliblist.repository_object_sparkfun_phant_arduino["json_data"]
         self.assertEqual(get_contributor_count(repository_object=repository_object), '2')
 
     def test_get_contributor_count_none(self):
         # requirements: 0 contributors
-        repository_object = TestInoLibraryList.repository_object_veberarnaud_shiftregister__arduinolibrary["json_data"]
+        repository_object = TestInoliblist.repository_object_veberarnaud_shiftregister__arduinolibrary["json_data"]
         self.assertEqual(get_contributor_count(repository_object=repository_object), '0')
 
     def test_create_output_file(self):
-        populate_row(repository_object=TestInoLibraryList.repository_object_sparkfun_phant_arduino["json_data"],
+        populate_row(repository_object=TestInoliblist.repository_object_sparkfun_phant_arduino["json_data"],
                      in_library_manager=True,
                      verify=False,
                      log_verification_failures=False)
