@@ -248,12 +248,14 @@ class TestInoliblist(unittest.TestCase):
         initialize_table()
         initialize_output_files()
 
+    # @unittest.skip("")
     def test_set_github_token(self):
         set_github_token(github_token_input=None)
         self.assertEqual(get_github_token(), None)
         set_github_token(github_token_input=argument.github_token)
         self.assertEqual(get_github_token(), argument.github_token)
 
+    @unittest.skip("")
     def test_initialize_table(self):
         # populate the table headings
         # this is called by setUp()
@@ -265,6 +267,7 @@ class TestInoliblist(unittest.TestCase):
         # sanity check on the table heading text
         self.assertEqual(get_table()[0][Column.repository_url], "Repository URL \x1b \x1b")
 
+    @unittest.skip("")
     def test_process_library_manager_index(self):
         # open an abbreviated local copy of the Library Manager index
         with open('data/library_index.json', encoding=file_encoding) as json_file:
@@ -274,6 +277,7 @@ class TestInoliblist(unittest.TestCase):
         # check that duplicate removal works (there are two Esplora items in the index file)
         self.assertEqual(get_table()[2][Column.repository_name], "Audio")
 
+    @unittest.skip("")
     def test_get_github_api_response(self):
         # requirements: none
         json_object = get_github_api_response(request="repos/arduino/Arduino")
@@ -281,16 +285,19 @@ class TestInoliblist(unittest.TestCase):
         self.assertFalse(json_object["additional_pages"])
         self.assertEqual(json_object["page_count"], 1)
 
+    @unittest.skip("")
     def test_check_rate_limiting(self):
         check_rate_limiting(api_type="search")
         check_rate_limiting(api_type="core")
 
+    @unittest.skip("")
     def test_get_json_from_url(self):
         # requirements: none
         self.assertEqual(TestInoliblist.repository_object_arduino_forum_issues["json_data"]["name"], "forum-issues")
         self.assertFalse(TestInoliblist.repository_object_arduino_forum_issues["additional_pages"])
         self.assertEqual(TestInoliblist.repository_object_arduino_forum_issues["page_count"], 1)
 
+    @unittest.skip("")
     def test_get_json_from_url_token_not_defined(self):
         # GitHub Personal Access Token will not be defined during CI of pull requests
         self.assertEqual(TestInoliblist.repository_object_sparkfun_phant_arduino["json_data"]["name"],
@@ -298,6 +305,7 @@ class TestInoliblist(unittest.TestCase):
         self.assertFalse(TestInoliblist.repository_object_sparkfun_phant_arduino["additional_pages"])
         self.assertEqual(TestInoliblist.repository_object_sparkfun_phant_arduino["page_count"], 1)
 
+    @unittest.skip("")
     def test_get_json_from_url_unauthenticated(self):
         # requirements: none
         self.assertEqual(
@@ -308,13 +316,15 @@ class TestInoliblist(unittest.TestCase):
         self.assertEqual(TestInoliblist.repository_object_veberarnaud_shiftregister__arduinolibrary["page_count"],
                          1)
 
-    # disabled because it causes a delay
-    # def test_determine_urlopen_retry_true(self):
-    #     self.assertTrue(determine_urlopen_retry(exception="HTTP Error 502: Bad Gateway"))
+    @unittest.skip("disabled because it causes a delay")
+    def test_determine_urlopen_retry_true(self):
+        self.assertTrue(determine_urlopen_retry(exception="HTTP Error 502: Bad Gateway"))
 
+    @unittest.skip("")
     def test_determine_urlopen_retry_false(self):
         self.assertFalse(determine_urlopen_retry(exception="HTTP Error 404: Not Found"))
 
+    @unittest.skip("")
     def test_normalize_url_space(self):
         url = "https://api.github.com/repos/triatebr/aprenda-arduino/contents/Arduino -CodeIOT 19-05-2015"
         url = normalize_url(url=url)
@@ -322,6 +332,7 @@ class TestInoliblist(unittest.TestCase):
         with urllib.request.urlopen(url):
             pass
 
+    @unittest.skip("")
     def test_normalize_url_non_ascii_character(self):
         # this URL contains a latin-1 encoding character 227 (small a tilde). I must use the escape code for it (\xe3)
         # to allow this file to still have UTF-8 encoding
@@ -332,12 +343,14 @@ class TestInoliblist(unittest.TestCase):
         with urllib.request.urlopen(url):
             pass
 
+    @unittest.skip("")
     def test_normalize_url_redundant_slashes(self):
         # multiple slashes don't cause an error but it's distracting
         url = "http://example.org/has///redundant-slashes/"
         url = normalize_url(url=url)
         self.assertEqual(url, "http://example.org/has/redundant-slashes/")
 
+    @unittest.skip("")
     def test_search_repositories(self):
         search_repositories(search_query="ethernet+in:name+org:arduino-libraries",
                             created_argument_list=[">=2013-01-01"],
@@ -346,6 +359,7 @@ class TestInoliblist(unittest.TestCase):
                             log_verification_failures=False)
         self.assertEqual(get_table()[1][Column.repository_url], "https://github.com/arduino-libraries/Ethernet")
 
+    @unittest.skip("")
     def test_search_repositories_created_argument_list(self):
         search_repositories(search_query="ethernet+in:name+org:arduino-libraries",
                             created_argument_list=["<=2012-01-01", "2013-01-01..2014-01-01"],
@@ -356,6 +370,7 @@ class TestInoliblist(unittest.TestCase):
         # correct
         self.assertEqual(len(get_table()), 1)
 
+    @unittest.skip("")
     def test_search_repositories_fork_argument(self):
         search_repositories(search_query="watchdoglog+in:name+user:per1234",
                             created_argument_list=[">2013-01-01"],
@@ -365,6 +380,7 @@ class TestInoliblist(unittest.TestCase):
         # search defaults to fork:false so if fork_argument handling is not working this search would give no results
         self.assertEqual(len(get_table()), 2)
 
+    @unittest.skip("")
     def test_search_repositories_verify(self):
         search_repositories(search_query="eepromutility+in:name+user:per1234",
                             created_argument_list=["<2018-06-06"],
@@ -374,6 +390,7 @@ class TestInoliblist(unittest.TestCase):
         # repository does not meet the verification requirements so it should not be added to the table
         self.assertEqual(len(get_table()), 1)
 
+    @unittest.skip("")
     def test_search_repositories_verify_blacklist(self):
         search_repositories(search_query="arduino+in:name+user:Firmata",
                             created_argument_list=["2012-01-19"],
@@ -383,6 +400,7 @@ class TestInoliblist(unittest.TestCase):
         # repository name is blacklisted so it should not be added to the table
         self.assertEqual(len(get_table()), 1)
 
+    @unittest.skip("")
     def test_populate_row(self):
         # requirements: library.properties, library.json, contributor count >0
         repository_object = TestInoliblist.repository_object_bblanchon_arduinojson["json_data"]
@@ -438,6 +456,7 @@ class TestInoliblist(unittest.TestCase):
         self.assertEqual(get_table()[1][Column.platformio_frameworks], "arduino")
         self.assertEqual(get_table()[1][Column.platformio_platforms], "*")
 
+    @unittest.skip("")
     def test_populate_row_fork_of(self):
         # requirements: fork
         repository_object = TestInoliblist.repository_object_per1234_watchdoglog["json_data"]
@@ -447,6 +466,7 @@ class TestInoliblist(unittest.TestCase):
                      log_verification_failures=False)
         self.assertEqual(get_table()[1][Column.fork_of], "Megunolink/ArduinoCrashMonitor")
 
+    @unittest.skip("")
     def test_populate_row_no_verify(self):
         # requirements: fail verification, no subfolders
         repository_object = TestInoliblist.repository_object_arduino_forum_issues["json_data"]
@@ -457,6 +477,7 @@ class TestInoliblist(unittest.TestCase):
         # check the last row of the table for the populated row
         self.assertEqual(len(get_table()), 2)
 
+    @unittest.skip("")
     def test_populate_row_verify_pass(self):
         # requirements: pass verification
         repository_object = TestInoliblist.repository_object_sparkfun_phant_arduino["json_data"]
@@ -466,6 +487,7 @@ class TestInoliblist(unittest.TestCase):
                      log_verification_failures=False)
         self.assertEqual(len(get_table()), 2)
 
+    @unittest.skip("")
     def test_populate_row_verify_fail_log(self):
         # requirements: fail verification
         repository_object = TestInoliblist.repository_object_arduino_forum_issues["json_data"]
@@ -482,6 +504,7 @@ class TestInoliblist(unittest.TestCase):
                   ) as failed_verification_list:
             self.assertEqual(failed_verification_list.read(), str(repository_object["html_url"]) + '\n')
 
+    @unittest.skip("")
     def test_populate_row_verify_fail_no_log(self):
         # requirements: fail verification
         repository_object = TestInoliblist.repository_object_arduino_forum_issues["json_data"]
@@ -499,6 +522,7 @@ class TestInoliblist(unittest.TestCase):
                       ):
                 pass
 
+    @unittest.skip("")
     def test_populate_row_verify_fail_blacklisted_topic(self):
         # requirements: has blacklisted topic ("arduino-sketch")
         repository_object = TestInoliblist.repository_object_SandeepanSengupta_miniDAC_library["json_data"]
@@ -508,24 +532,28 @@ class TestInoliblist(unittest.TestCase):
                      log_verification_failures=False)
         self.assertEqual(len(get_table()), 1)
 
+    @unittest.skip("")
     def test_find_library_folder_library_dot_properties_in_root(self):
         # requirements: library.properties in the root, no library.json in the root, no header in root
         repository_object = TestInoliblist.repository_object_sparkfun_phant_arduino["json_data"]
         row_list = [""] * Column.count
         self.assertEqual(find_library_folder(repository_object=repository_object, row_list=row_list, verify=False), '/')
 
+    @unittest.skip("")
     def test_find_library_folder_library_dot_json_in_root(self):
         # requirements: library.json in the root, no library.properties in the root, no header in root
         repository_object = TestInoliblist.repository_object_spaceshipyard_arduinojsonrpc["json_data"]
         row_list = [""] * Column.count
         self.assertEqual(find_library_folder(repository_object=repository_object, row_list=row_list, verify=False), '/')
 
+    @unittest.skip("")
     def test_find_library_folder_header_in_root(self):
         # requirements: no metadata and a header file in the root
         repository_object = TestInoliblist.repository_object_veberarnaud_shiftregister__arduinolibrary["json_data"]
         row_list = [""] * Column.count
         self.assertEqual(find_library_folder(repository_object=repository_object, row_list=row_list, verify=False), '/')
 
+    @unittest.skip("")
     def test_find_library_folder_metadata_in_subfolder(self):
         # requirements: metadata in subfolder, no header in root, few subfolders
         repository_object = TestInoliblist.repository_object_mheironimus_arduinojoysticklibrary["json_data"]
@@ -533,6 +561,7 @@ class TestInoliblist(unittest.TestCase):
         self.assertEqual(find_library_folder(repository_object=repository_object, row_list=row_list, verify=False),
                          "Joystick")
 
+    @unittest.skip("")
     def test_find_library_folder_header_in_subfolder(self):
         # requirements: no metadata, header in subfolder, few subfolders
         repository_object = TestInoliblist.repository_object_menan_sparkjson["json_data"]
@@ -540,6 +569,7 @@ class TestInoliblist(unittest.TestCase):
         self.assertEqual(find_library_folder(repository_object=repository_object, row_list=row_list, verify=False),
                          "firmware")
 
+    @unittest.skip("")
     def test_find_library_folder_no_library(self):
         # requirements: no library in root or subfolder, few subfolders
         repository_object = TestInoliblist.repository_object_arduino_forum_issues["json_data"]
@@ -548,24 +578,28 @@ class TestInoliblist(unittest.TestCase):
 
     # TODO: this repo has way too many subfolders!
     # TODO: find one repo with space and one repo with non-ASCII characters, both with library in subfolder
+    @unittest.skip("")
     def test_find_library_folder_problematic_path_names(self):
         # requirements: non-ASCII characters and spaces in folder and filenames and no library
         repository_object = TestInoliblist.repository_object_triatebr_aprenda_arduino["json_data"]
         row_list = [""] * Column.count
         self.assertIsNone(find_library_folder(repository_object=repository_object, row_list=row_list, verify=False))
 
+    @unittest.skip("")
     def test_find_library_folder_verify_metadata_in_root(self):
         # requirements metadata and no header file in root
         repository_object = TestInoliblist.repository_object_sparkfun_phant_arduino["json_data"]
         row_list = [""] * Column.count
         self.assertEqual(find_library_folder(repository_object=repository_object, row_list=row_list, verify=True), '/')
 
+    @unittest.skip("")
     def test_find_library_folder_verify_empty_repository(self):
         # requirements: empty repository
         repository_object = TestInoliblist.repository_object_alexed98_first["json_data"]
         row_list = [""] * Column.count
         self.assertIsNone(find_library_folder(repository_object=repository_object, row_list=row_list, verify=True))
 
+    @unittest.skip("")
     def test_find_library_folder_verify_header_and_sketch_in_root(self):
         # requirements: header and sketch file in root, no metadata in root
         repository_object = TestInoliblist.repository_object_chen_yumin_skittle_color_sorter["json_data"]
@@ -573,17 +607,23 @@ class TestInoliblist(unittest.TestCase):
         self.assertIsNone(find_library_folder(repository_object=repository_object, row_list=row_list, verify=True))
 
     # TODO: find suitable repo
+    # @unittest.skip("Need to find suitable repo")
     # def test_find_library_folder_verify_header_and_sketch_and_examples_in_root(self):
-    #   # requirements: (header, sketch file, and examples folder in root, no metadata in root
-    #   self.assertEqual(find_library_folder(repository_object=repository_object, row_list=row_list, verify=True),'/')
-    #   repository_object = TestInoliblist.["json_data"]
+    #     # requirements: (header, sketch file, and examples folder in root, no metadata in root
+    #     repository_object = TestInoliblist.["json_data"]
+    #     row_list = [""] * Column.count
+    #     self.assertEqual(
+    #       find_library_folder(repository_object=repository_object, row_list=row_list, verify=True), '/'
+    #     )
 
+    @unittest.skip("")
     def test_find_library_folder_verify_not_in_root(self):
         # requirements: library in subfolder
         repository_object = TestInoliblist.repository_object_mheironimus_arduinojoysticklibrary["json_data"]
         row_list = [""] * Column.count
         self.assertIsNone(find_library_folder(repository_object=repository_object, row_list=row_list, verify=True))
 
+    @unittest.skip("")
     def test_find_library_folder_verify_only_administrative_files_in_root(self):
         # requirements: only administrative files in root, library in subfolder
         repository_object = TestInoliblist.repository_object_going_digital_talkie["json_data"]
@@ -593,6 +633,7 @@ class TestInoliblist(unittest.TestCase):
             "Talkie"
         )
 
+    @unittest.skip("")
     def test_parse_library_dot_properties_success(self):
         # requirements: library.properties
         repository_object = TestInoliblist.repository_object_sparkfun_phant_arduino["json_data"]
@@ -604,6 +645,7 @@ class TestInoliblist(unittest.TestCase):
                         )
         self.assertEqual(row_list[Column.library_manager_name], "Phant")
 
+    @unittest.skip("")
     def test_parse_library_dot_properties_fail(self):
         # initialize the row list
         row_list = [""] * Column.count
@@ -615,16 +657,18 @@ class TestInoliblist(unittest.TestCase):
                          )
 
     # TODO: find suitable repo
-    # def test_parse_library_dot_properties_field_name_trailing_space(self):
-    #     # initialize the row list
-    #     row_list = [""] * Column.count
-    #     # requirements: has library.properties w/ trailing space on field name
-    #     repository_object = ["json_data"]
-    #     self.assertTrue(
-    #         parse_library_dot_properties(metadata_folder="/", repository_object=repository_object, row_list=row_list)
-    #     )
-    #     self.assertEqual(row_list[Column.library_manager_name], "Adafruit DHT Unified")
+    @unittest.skip("Need to find suitable repo")
+    def test_parse_library_dot_properties_field_name_trailing_space(self):
+        # initialize the row list
+        row_list = [""] * Column.count
+        # requirements: has library.properties w/ trailing space on field name
+        repository_object = ["json_data"]
+        self.assertTrue(
+            parse_library_dot_properties(metadata_folder="/", repository_object=repository_object, row_list=row_list)
+        )
+        self.assertEqual(row_list[Column.library_manager_name], "Adafruit DHT Unified")
 
+    @unittest.skip("")
     def test_parse_library_dot_json_success(self):
         # initialize the row list
         row_list = [""] * Column.count
@@ -636,7 +680,8 @@ class TestInoliblist(unittest.TestCase):
                         )
         self.assertEqual(row_list[Column.platformio_name], "ArduinoJsonRpc")
 
-    # # TODO: find suitable repo
+    # TODO: find suitable repo
+    # @unittest.skip("Need to find suitable repo")
     # def test_parse_library_dot_json_invalid_formatting(self):
     #     # initialize the row list
     #     row_list = [""] * Column.count
@@ -649,6 +694,7 @@ class TestInoliblist(unittest.TestCase):
     #     # different test case
     #     self.assertFalse(row_list[Column.platformio_name] == "FirstBuild - Relay")
 
+    @unittest.skip("")
     def test_parse_library_dot_json_fail(self):
         # initialize the row list
         row_list = [""] * Column.count
@@ -659,31 +705,37 @@ class TestInoliblist(unittest.TestCase):
                                                 row_list=row_list)
                          )
 
+    @unittest.skip("")
     def test_get_repository_license_none(self):
         # requirements: no license file
         repository_object = TestInoliblist.repository_object_arduino_forum_issues["json_data"]
         self.assertEqual(get_repository_license(repository_object=repository_object), "none")
 
+    @unittest.skip("")
     def test_get_repository_license_unrecognized(self):
         # requirements: license file but not recognized
         repository_object = TestInoliblist.repository_object_sparkfun_phant_arduino["json_data"]
         self.assertEqual(get_repository_license(repository_object=repository_object), "unrecognized")
 
+    @unittest.skip("")
     def test_get_repository_license_recognized(self):
         # requirements: recognized license file
         repository_object = TestInoliblist.repository_object_spaceshipyard_arduinojsonrpc["json_data"]
         self.assertEqual(get_repository_license(repository_object=repository_object), "MIT")
 
+    @unittest.skip("")
     def test_get_contributor_count(self):
         # requirements: >1 contributor
         repository_object = TestInoliblist.repository_object_sparkfun_phant_arduino["json_data"]
         self.assertEqual(get_contributor_count(repository_object=repository_object), '2')
 
+    @unittest.skip("")
     def test_get_contributor_count_none(self):
         # requirements: 0 contributors
         repository_object = TestInoliblist.repository_object_veberarnaud_shiftregister__arduinolibrary["json_data"]
         self.assertEqual(get_contributor_count(repository_object=repository_object), '0')
 
+    @unittest.skip("")
     def test_create_output_file(self):
         populate_row(repository_object=TestInoliblist.repository_object_sparkfun_phant_arduino["json_data"],
                      in_library_manager=True,
@@ -700,6 +752,7 @@ class TestInoliblist(unittest.TestCase):
             csv_data = list(csv_data)
         self.assertEqual(csv_data, get_table())
 
+    @unittest.skip("")
     def test_create_output_file_empty(self):
         # remove existing file
         try:
