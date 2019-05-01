@@ -26,7 +26,6 @@ sys.argv[1:] = argument.unittest_args
 class TestInoliblist(unittest.TestCase):
     # NOTE: the tests are run in order sorted by method name, not in the order below
 
-    # uncomment for debugging
     if argument.enable_verbosity:
         set_verbosity(enable_verbosity_input=True)
 
