@@ -1402,7 +1402,7 @@ def get_repository_license(repository_object):
     if repository_object["license"] is None:
         # no license file in the repo root
         return no_license_identifier
-    elif repository_object["license"]["spdx_id"] is None:
+    elif str(repository_object["license"]["spdx_id"]) == "NOASSERTION":
         # there is a license file but the Licensee Ruby gem used by GitHub was unable to determine a standard license
         # type from it
         return unrecognized_license_identifier
