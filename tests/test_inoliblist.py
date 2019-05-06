@@ -154,6 +154,7 @@ class TestInoliblist(unittest.TestCase):
     # license:MIT
     # contributor count:1
     # blacklisted topic:n
+    # library in blacklisted subfolder name:y
     repository_object_menan_sparkjson = get_json_from_url(url="https://api.github.com/repos/menan/SparkJson"
                                                           )
 
@@ -567,6 +568,14 @@ class TestInoliblist(unittest.TestCase):
         row_list = [""] * Column.count
         self.assertEqual(find_library_folder(repository_object=repository_object, row_list=row_list, verify=False),
                          "firmware")
+
+    # @unittest.skip("")
+    def test_find_library_folder_header_in_blacklisted_subfolder(self):
+        # requirements: no metadata, header in blacklisted subfolder, few subfolders
+        repository_object = TestInoliblist.repository_object_menan_sparkjson["json_data"]
+        row_list = [""] * Column.count
+        self.assertEqual(find_library_folder(repository_object=repository_object, row_list=row_list, verify=False),
+                         None)
 
     # @unittest.skip("")
     def test_find_library_folder_no_library(self):
