@@ -975,9 +975,12 @@ def find_library_folder(repository_object, row_list, verify):
     repository_object -- the repository's JSON
     row_list -- the list being populated by populate_row(). Information from any metadata files found during the search
                 will be added to this list.
-    verify -- if verification is enabled then it is required that the library be found in the root of the repository
-              and measures will be taken to avoid mistaking a sketch for a library. If verification is not enabled then
-              subfolders of the library will also be checked. (True, False)
+    verify -- if verification is enabled then it is required that the library either be found in the root of the
+              repository or that the root folder only contains administrative files, in which case one level of
+              subfolders will also be checked. Measures will be taken to avoid mistaking a sketch for a library.
+
+              If verification is not enabled then the repository and one level of subfolders will also be checked and no
+              measures will be taken to avoid mistaking a sketch for a library. (True, False)
     """
     # start with a blind attempt to open and parse a metadata file in the repository root to avoid unnecessary GitHub
     # API requests
@@ -1122,9 +1125,9 @@ def find_library(folder_listing, verify):
 
     Keyword arguments:
     folder_listing -- list of the folder contents
-    verify -- if verification is enabled then it is required that the library be found in the root of the repository
-              and measures will be taken to avoid mistaking a sketch for a library. If verification is not enabled then
-              subfolders of the library will also be checked. (True, False)
+    verify -- if verification is enabled then measures will be taken to avoid mistaking a sketch for a library.
+              If verification is not enabled then the presence of a metadata file or header file is sufficient to
+              consider the folder as containing a library. (True, False)
 
     Return values:
     True -- library found
@@ -1153,7 +1156,7 @@ def find_library(folder_listing, verify):
                         header_file_found = True
         # these checks are only required for verification
         if verify:
-            # check for sketch files in repo root
+            # check for sketch files
             if folder_item["type"] == "file":
                 if (
                         folder_item["name"].endswith(".ino") or
@@ -1169,7 +1172,7 @@ def find_library(folder_listing, verify):
                         break
                 if not is_administrative_file:
                     only_administrative_files_found = False
-            # check for examples folder in repo root
+            # check for examples folder
             elif folder_item["type"] == "dir":
                 for examples_folder_name_regex in examples_folder_names:
                     examples_folder_name_regex = re.compile(examples_folder_name_regex, flags=re.IGNORECASE)
@@ -1178,13 +1181,13 @@ def find_library(folder_listing, verify):
                         break
 
     if verify:
-        # to pass verification, the repo must meet one of the following:
-        # - has metadata file in root
-        # - has header file and no sketch file in root
+        # to pass verification, the folder must meet one of the following:
+        # - has metadata file
+        # - has header file and no sketch file
         # - has header file and either examples (or some variant) folder or keywords.txt in root
-        # - has only administrative files in the root and a subfolder meets one of the above
+        # if only administrative files are found, then verification is inconclusive
         if metadata_file_found:
-            # metadata is sufficient whether or not verification is required
+            # verification passed
             return True
         elif header_file_found and not sketch_file_found:
             # verification passed
@@ -1194,13 +1197,14 @@ def find_library(folder_listing, verify):
             # verification passed
             return True
         elif only_administrative_files_found:
-            # only administrative files were found in the root so check the subfolders too
+            # only administrative files were found so verification is inconclusive
             return None
         else:
             # verification failed
             return False
     else:
         if metadata_file_found:
+            # verification passed
             return True
         if header_file_found:
             # if verification is off then just finding a header file is enough
