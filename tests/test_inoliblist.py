@@ -203,6 +203,7 @@ class TestInoliblist(unittest.TestCase):
     # only administrative files in root:y
     # license:n
     # contributor count:2
+    # blacklisted topic:n
     repository_object_going_digital_talkie = get_json_from_url(
         url="https://api.github.com/repos/going-digital/Talkie"
     )
@@ -223,24 +224,6 @@ class TestInoliblist(unittest.TestCase):
     # blacklisted topic:n
     repository_object_per1234_watchdoglog = get_json_from_url(
         url="https://api.github.com/repos/per1234/watchdoglog"
-    )
-
-    # https://github.com/SandeepanSengupta/miniDAC-library
-    # folder count:2
-    # archived:n
-    # active:y
-    # fork:y
-    # library.properties:y
-    # library.json:n
-    # header:/
-    # sketch in root:n
-    # examples folder in root:y
-    # only administrative files in root:n
-    # license:n
-    # contributor count:3
-    # blacklisted topic:y
-    repository_object_SandeepanSengupta_miniDAC_library = get_json_from_url(
-        url="https://api.github.com/repos/SandeepanSengupta/miniDAC-library"
     )
 
     def setUp(self):
@@ -525,7 +508,7 @@ class TestInoliblist(unittest.TestCase):
     # @unittest.skip("")
     def test_populate_row_verify_fail_blacklisted_topic(self):
         # requirements: has blacklisted topic ("arduino-sketch")
-        repository_object = TestInoliblist.repository_object_SandeepanSengupta_miniDAC_library["json_data"]
+        repository_object = TestInoliblist.repository_object_chen_yumin_skittle_color_sorter["json_data"]
         populate_row(repository_object=repository_object,
                      in_library_manager=True,
                      verify=True,
