@@ -174,20 +174,20 @@ class TestInoliblist(unittest.TestCase):
         url="https://api.github.com/repos/chen-yumin/skittle-color-sorter"
     )
 
-    # https://github.com/bblanchon/ArduinoJson
-    # folder count:6
+    # https://github.com/bbx10/arduinoWebSockets
+    # folder count:4
     # archived:n
-    # fork:n
+    # fork:y
     # library.properties:/
     # library.json:/
     # header:src
     # sketch in root:n
     # examples folder in root:y
-    # license:MIT
-    # contributor count:9
+    # license:LGPL-2.1
+    # contributor count:22
     # blacklisted topic:n
-    repository_object_bblanchon_arduinojson = get_json_from_url(
-        url="https://api.github.com/repos/bblanchon/ArduinoJson"
+    repository_object_bbx10_arduinowebsockets = get_json_from_url(
+        url="https://api.github.com/repos/bbx10/arduinoWebSockets"
     )
 
     # https://github.com/going-digital/Talkie
@@ -385,57 +385,51 @@ class TestInoliblist(unittest.TestCase):
 
     # @unittest.skip("")
     def test_populate_row(self):
-        # requirements: library.properties, library.json, contributor count >0
-        repository_object = TestInoliblist.repository_object_bblanchon_arduinojson["json_data"]
+        # requirements: library.properties, library.json, contributor count >0, has topic
+        repository_object = TestInoliblist.repository_object_bbx10_arduinowebsockets["json_data"]
         populate_row(repository_object=repository_object,
-                     in_library_manager=True,
+                     in_library_manager=False,
                      verify=False,
                      log_verification_failures=False)
-        self.assertEqual(get_table()[1][Column.repository_url], "https://github.com/bblanchon/ArduinoJson")
-        self.assertEqual(get_table()[1][Column.repository_owner], "bblanchon")
-        self.assertEqual(get_table()[1][Column.repository_name], "ArduinoJson")
+        self.assertEqual(get_table()[1][Column.repository_url], "https://github.com/bbx10/arduinoWebSockets")
+        self.assertEqual(get_table()[1][Column.repository_owner], "bbx10")
+        self.assertEqual(get_table()[1][Column.repository_name], "arduinoWebSockets")
         self.assertEqual(get_table()[1][Column.repository_default_branch], "master")
         self.assertEqual(get_table()[1][Column.library_path], "/")
         self.assertEqual(get_table()[1][Column.archived], "False")
-        self.assertEqual(get_table()[1][Column.is_fork], "False")
-        self.assertEqual(get_table()[1][Column.fork_of], "")
+        self.assertEqual(get_table()[1][Column.is_fork], "True")
+        self.assertEqual(get_table()[1][Column.fork_of], "Links2004/arduinoWebSockets")
         self.assertNotEqual(get_table()[1][Column.last_push_date], "")
         self.assertNotEqual(get_table()[1][Column.fork_count], "")
         self.assertNotEqual(get_table()[1][Column.star_count], "")
         self.assertNotEqual(get_table()[1][Column.contributor_count], "")
         self.assertNotEqual(get_table()[1][Column.contributor_count], "0")
-        self.assertEqual(get_table()[1][Column.repository_license], "MIT")
+        self.assertEqual(get_table()[1][Column.repository_license], "LGPL-2.1")
         self.assertEqual(get_table()[1][Column.repository_language], "C++")
         self.assertNotEqual(get_table()[1][Column.repository_description], "")
         self.assertNotEqual(get_table()[1][Column.github_topics], "")
-        self.assertEqual(get_table()[1][Column.in_library_manager_index], "True")
+        self.assertEqual(get_table()[1][Column.in_library_manager_index], "False")
         # self.assertEqual(get_table()[1][Column.in_platformio_library_registry], "True")
-        self.assertEqual(get_table()[1][Column.library_manager_name], "ArduinoJson")
+        self.assertEqual(get_table()[1][Column.library_manager_name], "WebSockets")
         self.assertNotEqual(get_table()[1][Column.library_manager_version], "")
-        self.assertEqual(get_table()[1][Column.library_manager_author], "Benoit Blanchon <blog.benoitblanchon.fr>")
-        self.assertEqual(get_table()[1][Column.library_manager_maintainer], "Benoit Blanchon <blog.benoitblanchon.fr>")
-        self.assertEqual(get_table()[1][Column.library_manager_sentence],
-                         "An efficient and elegant JSON library for Arduino.")
-        self.assertEqual(get_table()[1][Column.library_manager_paragraph],
-                         "ArduinoJson supports ✔ serialization, ✔ deserialization, ✔ fixed allocation, " +
-                         "✔ zero-copy, ✔ streams, and more. It is the most popular Arduino library on GitHub " +
-                         "❤❤❤❤❤. Check out arduinojson.org for a comprehensive documentation."
-                         )
-        self.assertEqual(get_table()[1][Column.library_manager_category], "Data Processing")
-        self.assertEqual(get_table()[1][Column.library_manager_url],
-                         "https://arduinojson.org/?utm_source=meta&utm_medium=library.properties")
+        self.assertEqual(get_table()[1][Column.library_manager_author], "Markus Sattler")
+        self.assertEqual(get_table()[1][Column.library_manager_maintainer], "Markus Sattler")
+        self.assertEqual(get_table()[1][Column.library_manager_sentence], "WebSockets for Arduino (Server + Client)")
+        self.assertEqual(get_table()[1][Column.library_manager_paragraph], "use 2.x.x for ESP and 1.3 for AVR")
+        self.assertEqual(get_table()[1][Column.library_manager_category], "Communication")
+        self.assertEqual(get_table()[1][Column.library_manager_url], "https://github.com/Links2004/arduinoWebSockets")
         self.assertEqual(get_table()[1][Column.library_manager_architectures], "*")
-        self.assertEqual(get_table()[1][Column.platformio_name], "ArduinoJson")
+        self.assertEqual(get_table()[1][Column.platformio_name], "WebSockets")
         self.assertEqual(get_table()[1][Column.platformio_description],
-                         "An elegant and efficient JSON library for embedded systems")
-        self.assertEqual(get_table()[1][Column.platformio_keywords], "json, rest, http, web")
-        self.assertEqual(get_table()[1][Column.platformio_authors], "Benoit Blanchon")
-        self.assertEqual(get_table()[1][Column.platformio_repository], "https://github.com/bblanchon/ArduinoJson.git")
+                         "WebSocket Server and Client for Arduino based on RFC6455")
+        self.assertEqual(get_table()[1][Column.platformio_keywords], "wifi, http, web, server, client, websocket")
+        self.assertEqual(get_table()[1][Column.platformio_authors], "Markus Sattler")
+        self.assertEqual(get_table()[1][Column.platformio_repository],
+                         "https://github.com/Links2004/arduinoWebSockets.git")
         self.assertNotEqual(get_table()[1][Column.platformio_version], "")
-        self.assertEqual(get_table()[1][Column.platformio_license], "")
+        self.assertEqual(get_table()[1][Column.platformio_license], "LGPL-2.1")
         self.assertEqual(get_table()[1][Column.platformio_download_url], "")
-        self.assertEqual(get_table()[1][Column.platformio_homepage],
-                         "https://arduinojson.org/?utm_source=meta&utm_medium=library.json")
+        self.assertEqual(get_table()[1][Column.platformio_homepage], "")
         self.assertEqual(get_table()[1][Column.platformio_frameworks], "arduino")
         self.assertEqual(get_table()[1][Column.platformio_platforms], "*")
 
