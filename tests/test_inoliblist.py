@@ -248,7 +248,7 @@ class TestInoliblist(unittest.TestCase):
         # the row should have Column.count columns
         self.assertEqual(len(get_table()[0]), Column.count)
         # sanity check on the table heading text
-        self.assertEqual(get_table()[0][Column.repository_url], "Repository URL \x1b \x1b")
+        self.assertEqual(get_table()[0][Column.repository_url], "Repository URL \u200b \u200b")
 
     # @unittest.skip("")
     def test_process_library_manager_index(self):
