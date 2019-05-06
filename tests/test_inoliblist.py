@@ -564,10 +564,10 @@ class TestInoliblist(unittest.TestCase):
     # @unittest.skip("")
     def test_find_library_folder_header_in_subfolder(self):
         # requirements: no metadata, header in subfolder, few subfolders
-        repository_object = TestInoliblist.repository_object_menan_sparkjson["json_data"]
+        repository_object = TestInoliblist.repository_object_going_digital_talkie["json_data"]
         row_list = [""] * Column.count
         self.assertEqual(find_library_folder(repository_object=repository_object, row_list=row_list, verify=False),
-                         "firmware")
+                         "Talkie")
 
     # @unittest.skip("")
     def test_find_library_folder_header_in_blacklisted_subfolder(self):
