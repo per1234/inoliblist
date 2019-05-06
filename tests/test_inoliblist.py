@@ -196,7 +196,7 @@ class TestInoliblist(unittest.TestCase):
     # active:n
     # fork:n
     # library.properties:n
-    # library.json:m
+    # library.json:n
     # header:Talkie
     # sketch in root:n
     # examples folder in root:n
@@ -213,7 +213,7 @@ class TestInoliblist(unittest.TestCase):
     # active:y
     # fork:y
     # library.properties:y
-    # library.json:m
+    # library.json:n
     # header:/
     # sketch in root:n
     # examples folder in root:y
