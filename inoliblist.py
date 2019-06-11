@@ -116,7 +116,7 @@ examples_folder_names = [r"^examples$",
                          r"^example$"
                          ]
 
-# regular expressions fo subfolders to skip when searching the repository for a library
+# regular expressions for subfolders to skip when searching the repository for a library
 library_subfolder_blacklist = [r"^\..*",  # starts with .
                                r"^3dmodel.$"
                                r"^android$",
